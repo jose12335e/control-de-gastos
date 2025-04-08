@@ -5,10 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Gastos - Inicio de Sesión</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Control de Gastos</h1>
+        <header>
+            <h1>Control de Gastos</h1>
+            <button id="btn-cambio-tema" class="btn-tema" title="Cambiar tema">
+                <span class="icono-tema">🌙</span>
+            </button>
+        </header>
         
         <!-- Formulario de Inicio de Sesión -->
         <section class="seccion-login">
@@ -18,6 +26,22 @@
                 <input type="password" id="password-login" placeholder="Contraseña" required>
                 <button type="submit">Iniciar Sesión</button>
             </form>
+            
+            <div class="separador">
+                <span>o</span>
+            </div>
+            
+            <div class="auth-buttons">
+                <button id="btn-google" class="btn-social">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" class="icono-social">
+                    Continuar con Google
+                </button>
+                <button id="btn-telefono" class="btn-social">
+                    <img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Teléfono" class="icono-social">
+                    Continuar con Teléfono
+                </button>
+            </div>
+            
             <p>¿No tienes una cuenta? <a href="#" id="mostrar-registro">Regístrate aquí</a></p>
         </section>
 
@@ -31,10 +55,95 @@
                 <input type="password" id="confirmar-password" placeholder="Confirmar contraseña" required>
                 <button type="submit">Registrarse</button>
             </form>
+            
+            <div class="separador">
+                <span>o</span>
+            </div>
+            
+            <div class="auth-buttons">
+                <button id="btn-google-registro" class="btn-social">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" class="icono-social">
+                    Registrarse con Google
+                </button>
+                <button id="btn-telefono-registro" class="btn-social">
+                    <img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Teléfono" class="icono-social">
+                    Registrarse con Teléfono
+                </button>
+            </div>
+            
             <p>¿Ya tienes una cuenta? <a href="#" id="mostrar-login">Inicia sesión aquí</a></p>
+        </section>
+        
+        <!-- Formulario de verificación por teléfono (inicialmente oculto) -->
+        <section class="seccion-telefono" style="display: none;">
+            <h2>Verificación por Teléfono</h2>
+            <form id="form-telefono">
+                <div class="input-group">
+                    <label for="codigo-pais">Código de país:</label>
+                    <select id="codigo-pais">
+                        <option value="+52">México (+52)</option>
+                        <option value="+1">Estados Unidos (+1)</option>
+                        <option value="+34">España (+34)</option>
+                        <option value="+54">Argentina (+54)</option>
+                        <option value="+56">Chile (+56)</option>
+                        <option value="+57">Colombia (+57)</option>
+                        <option value="+58">Venezuela (+58)</option>
+                        <option value="+591">Bolivia (+591)</option>
+                        <option value="+593">Ecuador (+593)</option>
+                        <option value="+51">Perú (+51)</option>
+                        <option value="+55">Brasil (+55)</option>
+                        <option value="+598">Uruguay (+598)</option>
+                        <option value="+595">Paraguay (+595)</option>
+                        <option value="+506">Costa Rica (+506)</option>
+                        <option value="+502">Guatemala (+502)</option>
+                        <option value="+504">Honduras (+504)</option>
+                        <option value="+503">El Salvador (+503)</option>
+                        <option value="+505">Nicaragua (+505)</option>
+                        <option value="+507">Panamá (+507)</option>
+                        <option value="+593">Ecuador (+593)</option>
+                        <option value="+56">Chile (+56)</option>
+                        <option value="+57">Colombia (+57)</option>
+                        <option value="+58">Venezuela (+58)</option>
+                        <option value="+591">Bolivia (+591)</option>
+                        <option value="+593">Ecuador (+593)</option>
+                        <option value="+51">Perú (+51)</option>
+                        <option value="+55">Brasil (+55)</option>
+                        <option value="+598">Uruguay (+598)</option>
+                        <option value="+595">Paraguay (+595)</option>
+                        <option value="+506">Costa Rica (+506)</option>
+                        <option value="+502">Guatemala (+502)</option>
+                        <option value="+504">Honduras (+504)</option>
+                        <option value="+503">El Salvador (+503)</option>
+                        <option value="+505">Nicaragua (+505)</option>
+                        <option value="+507">Panamá (+507)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="telefono">Número de teléfono:</label>
+                    <input type="tel" id="telefono" placeholder="Número de teléfono" required>
+                </div>
+                <button type="submit" id="btn-enviar-codigo">Enviar código de verificación</button>
+            </form>
+            <p><a href="#" id="volver-login">Volver al inicio de sesión</a></p>
+        </section>
+        
+        <!-- Formulario de verificación de código (inicialmente oculto) -->
+        <section class="seccion-verificacion" style="display: none;">
+            <h2>Verificar Código</h2>
+            <form id="form-verificacion">
+                <div class="input-group">
+                    <label for="codigo-verificacion">Código de verificación:</label>
+                    <input type="text" id="codigo-verificacion" placeholder="Ingresa el código recibido" required>
+                </div>
+                <button type="submit" id="btn-verificar-codigo">Verificar</button>
+            </form>
+            <p><a href="#" id="volver-telefono">Volver</a></p>
         </section>
     </div>
 
+    <!-- Script de autenticación -->
+    <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
+    <script src="theme.js"></script>
 </body>
 </html>

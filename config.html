@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Gastos - Configuración</title>
+    <title data-translate="configTitle">Configuración</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Control de Gastos</h1>
-            <div class="usuario-info">
-                <span id="nombre-usuario"></span>
-                <button id="btn-cerrar-sesion">Cerrar Sesión</button>
+    <header>
+        <nav>
+            <h1 data-translate="appTitle">Control de Gastos</h1>
+            <div class="menu">
+                <a href="app.html" class="btn-volver" data-translate="backToHome">Volver al Inicio</a>
+                <button id="btnCerrarSesion" data-translate="logoutBtn">Cerrar Sesión</button>
             </div>
-        </header>
-
-        <nav class="menu-principal">
-            <a href="app.html">Inicio</a>
-            <a href="config.html" class="activo">Configuración</a>
         </nav>
+    </header>
 
+    <main>
         <section class="seccion-configuracion">
-            <h2>Configuración</h2>
+            <h2 data-translate="configTitle">Configuración</h2>
             
+            <div class="config-group">
+                <h3 data-translate="languageTitle">Idioma / Language</h3>
+                <div class="language-buttons">
+                    <button onclick="changeLanguage('es')" class="lang-btn">Español</button>
+                    <button onclick="changeLanguage('en')" class="lang-btn">English</button>
+                </div>
+            </div>
+
             <div class="config-item">
                 <h3>Moneda</h3>
                 <select id="moneda-select">
@@ -37,19 +42,7 @@
                     <option value="BRL">Real brasileño (R$)</option>
                     <option value="GBP">Libra esterlina (£)</option>
                     <option value="JPY">Yen japonés (¥)</option>
-                    <option value="DOP">peso dominicano (RD$)</option>
-                </select>
-            </div>
-
-            <div class="config-item">
-                <h3>Idioma</h3>
-                <select id="idioma-select">
-                    <option value="es">Español</option>
-                    <option value="en">English</option>
-                    <option value="pt">Português</option>
-                    <option value="fr">Français</option>
-                    <option value="de">Deutsch</option>
-                    <option value="it">Italiano</option>
+                    <option value="DOP">Peso dominicano (RD$)</option>
                 </select>
             </div>
 
@@ -71,11 +64,36 @@
                 </select>
             </div>
 
-            <button id="guardar-config" class="btn-principal">Guardar Configuración</button>
+            <div class="config-actions">
+                <button id="guardar-config" class="btn-principal">Guardar Cambios</button>
+            </div>
         </section>
-    </div>
+    </main>
 
+    <script src="translations.js"></script>
+    <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
-    <script src="config.js"></script>
+    <script src="theme.js"></script>
+    <script>
+        // Cargar el idioma guardado al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLanguage = localStorage.getItem('language') || 'es';
+            changeLanguage(savedLanguage);
+            
+            // Cargar el tema guardado
+            const temaGuardado = localStorage.getItem('tema') || 'claro';
+            const temaSelect = document.getElementById('tema-select');
+            if (temaSelect) {
+                temaSelect.value = temaGuardado;
+                
+                // Añadir evento para cambiar el tema al seleccionar una opción
+                temaSelect.addEventListener('change', () => {
+                    const nuevoTema = temaSelect.value;
+                    aplicarTema(nuevoTema);
+                    localStorage.setItem('tema', nuevoTema);
+                });
+            }
+        });
+    </script>
 </body>
 </html> 

@@ -9,7 +9,7 @@ body {
     line-height: 1.6;
     background-color: #f5f5f5;
     color: #333;
-    transition: background-color 0.3s, color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .container {
@@ -288,27 +288,49 @@ li:last-child {
 /* Estilos para la sección de configuración */
 .seccion-configuracion {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.config-item {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #f8f9fa;
+.config-group {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px solid #eee;
     border-radius: 4px;
 }
 
-.config-item h3 {
-    margin-bottom: 10px;
-    color: #4a6fa5;
+.config-group h3 {
+    margin-bottom: 1rem;
+    color: #333;
 }
 
-.config-item select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
+.language-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #007bff;
     border-radius: 4px;
-    font-size: 16px;
+    background-color: white;
+    color: #007bff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.lang-btn.active {
+    background-color: #007bff;
+    color: white;
 }
 
 /* Estilos para temas */
@@ -318,8 +340,8 @@ li:last-child {
 }
 
 .tema-oscuro {
-    background-color: #222;
-    color: #f5f5f5;
+    background-color: #1a1a1a;
+    color: #ffffff;
 }
 
 .tema-oscuro h1, .tema-oscuro h2, .tema-oscuro h3, .tema-oscuro h4 {
@@ -327,60 +349,69 @@ li:last-child {
 }
 
 .tema-oscuro section, .tema-oscuro .columna {
-    background-color: #333;
-    color: #f5f5f5;
+    background-color: #2d2d2d;
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.tema-oscuro input, .tema-oscuro select {
-    background-color: #444;
-    color: #f5f5f5;
-    border-color: #555;
+.tema-oscuro input, .tema-oscuro select, .tema-oscuro button {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-color: #4d4d4d;
+}
+
+.tema-oscuro input:focus, .tema-oscuro select:focus {
+    border-color: #4a6fa5;
 }
 
 .tema-oscuro .gasto-item {
-    border-bottom-color: #444;
+    border-color: #3d3d3d;
 }
 
-.tema-oscuro .estadistica-general, .tema-oscuro .estadistica-tipos,
-.tema-oscuro .gastos-filtrados-seccion, .tema-oscuro .config-item {
-    background-color: #444;
+.tema-oscuro .gasto-fecha {
+    color: #aaaaaa;
 }
 
-.tema-oscuro .menu-principal {
-    background-color: #333;
+.tema-oscuro .historial-item {
+    border-color: #3d3d3d;
 }
 
-.tema-oscuro .menu-principal a {
-    color: #f5f5f5;
-}
-
-.tema-oscuro .menu-principal a:hover {
-    background-color: #444;
+.tema-oscuro .historial-item:hover {
+    background-color: #3d3d3d;
 }
 
 .tema-azul {
-    background-color: #e6f2ff;
-    color: #333;
+    background-color: #f0f4f8;
+    color: #2c3e50;
 }
 
 .tema-azul header, .tema-azul .app-header {
-    background-color: #0066cc;
+    background-color: #2c3e50;
+}
+
+.tema-azul .menu-principal {
+    background-color: #ffffff;
 }
 
 .tema-azul .menu-principal a.activo {
-    background-color: #0066cc;
+    background-color: #3498db;
+}
+
+.tema-azul section, .tema-azul .columna, .tema-azul .seccion-configuracion .config-item {
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .tema-azul button, .tema-azul .btn-principal {
-    background-color: #0066cc;
+    background-color: #3498db;
 }
 
 .tema-azul button:hover, .tema-azul .btn-principal:hover {
-    background-color: #0052a3;
+    background-color: #2980b9;
 }
 
 .tema-azul .gasto-tipo {
-    color: #0066cc;
+    color: #3498db;
 }
 
 /* Estilos responsivos */
@@ -408,6 +439,19 @@ li:last-child {
         flex-direction: column;
         gap: 10px;
         align-items: center;
+    }
+
+    .seccion-configuracion {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .language-buttons {
+        flex-direction: column;
+    }
+
+    .lang-btn {
+        width: 100%;
     }
 }
 
@@ -531,11 +575,58 @@ li:last-child {
     color: #dc3545;
 }
 
+.filtros-fecha {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filtros-fecha .input-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filtros-fecha label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.filtros-fecha input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.filtros-fecha button {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filtros-fecha button:hover {
+    background-color: #45a049;
+}
+
+.filtros-fecha #btnMostrarTodos {
+    background-color: #2196F3;
+}
+
+.filtros-fecha #btnMostrarTodos:hover {
+    background-color: #1976D2;
+}
+
 .mensaje-sin-gastos {
     text-align: center;
-    color: #6c757d;
-    font-style: italic;
+    color: #666;
     padding: 20px;
+    font-style: italic;
 }
 
 /* Responsive */
@@ -633,4 +724,230 @@ li:last-child {
     .historial-fecha {
         min-width: auto;
     }
+}
+
+/* Estilos para mensajes en configuración */
+.mensaje-error,
+.mensaje-exito {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    font-weight: 500;
+}
+
+.mensaje-error {
+    background-color: #dc3545;
+    color: white;
+}
+
+.mensaje-exito {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Estilos para las acciones de configuración */
+.config-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.config-actions button {
+    min-width: 200px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* Estilos para el tema oscuro */
+.tema-oscuro .config-actions button {
+    background-color: #4a6fa5;
+    color: white;
+}
+
+.tema-oscuro .config-actions button:hover {
+    background-color: #3a5a8c;
+}
+
+/* Estilos para el tema azul */
+.tema-azul .config-actions button {
+    background-color: #3498db;
+}
+
+.tema-azul .config-actions button:hover {
+    background-color: #2980b9;
+}
+
+/* Estilos para el botón de volver */
+.btn-volver {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-right: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn-volver:hover {
+    background-color: #0056b3;
+}
+
+/* Ajustes responsivos para el botón de volver */
+@media (max-width: 768px) {
+    .btn-volver {
+        display: block;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+}
+
+/* Estilos para el botón de cambio de tema */
+.btn-tema {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    margin-right: 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-tema:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.icono-tema {
+    display: inline-block;
+}
+
+/* Ajustes para el tema oscuro */
+.tema-oscuro .btn-tema {
+    color: #ffffff;
+}
+
+.tema-oscuro .btn-tema:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ajustes para el tema azul */
+.tema-azul .btn-tema {
+    color: #ffffff;
+}
+
+.tema-azul .btn-tema:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para autenticación social */
+.separador {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.separador::before,
+.separador::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.separador span {
+    padding: 0 10px;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1rem;
+}
+
+.btn-social:hover {
+    background-color: #f5f5f5;
+}
+
+.icono-social {
+    width: 20px;
+    height: 20px;
+}
+
+/* Estilos para el formulario de teléfono */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-group select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+/* Ajustes para el tema oscuro */
+.tema-oscuro .btn-social {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-color: #4d4d4d;
+}
+
+.tema-oscuro .btn-social:hover {
+    background-color: #4d4d4d;
+}
+
+.tema-oscuro .separador::before,
+.tema-oscuro .separador::after {
+    border-bottom-color: #4d4d4d;
+}
+
+.tema-oscuro .separador span {
+    color: #aaaaaa;
+}
+
+/* Ajustes para el tema azul */
+.tema-azul .btn-social {
+    background-color: #ffffff;
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.tema-azul .btn-social:hover {
+    background-color: #f0f4f8;
 }
