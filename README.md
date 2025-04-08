@@ -68,4 +68,4 @@ Esta aplicación puede ser desplegada en cualquier servicio de hosting estático
 
 ## Licencia
 
-Este proyecto está bajo la Licencia MIT.  
+Este proyecto está bajo la Licencia MIT. 

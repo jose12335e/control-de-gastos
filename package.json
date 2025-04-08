@@ -1,0 +1,12 @@
+{
+  "name": "registro-gastos",
+  "version": "1.0.0",
+  "description": "Aplicación de registro de gastos",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=8000 --no-browser"
+  },
+  "dependencies": {
+    "live-server": "^1.2.2"
+  }
+} 

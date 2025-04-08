@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Gastos - Aplicación</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>Control de Gastos</h1>
+            <div class="user-info">
+                <span id="nombre-usuario">Usuario</span>
+                <button id="btn-cerrar-sesion">Cerrar Sesión</button>
+            </div>
+        </header>
+        
+        <nav class="menu-principal">
+            <a href="app.html" class="activo">Inicio</a>
+            <a href="config.html">Configuración</a>
+        </nav>
+        
+        <!-- Formulario para ingresar sueldo -->
+        <section class="seccion-sueldo">
+            <h2>Ingresa tu Sueldo</h2>
+            <form id="form-sueldo">
+                <input type="number" id="sueldo" placeholder="Ingresa tu sueldo" step="0.01" required>
+                <div class="fecha-cobro">
+                    <label for="dia-cobro">Día de cobro mensual:</label>
+                    <input type="number" id="dia-cobro" min="1" max="31" placeholder="Día del mes" required>
+                </div>
+                <button type="submit">Actualizar Sueldo</button>
+            </form>
+            <div id="sueldo-restante">
+                <h2>Sueldo Restante: $0.00</h2>
+            </div>
+        </section>
+
+        <!-- Contenedor de columnas para gastos fijos y diarios -->
+        <div class="columnas-container">
+            <!-- Columna de Gastos Fijos -->
+            <div class="columna">
+                <h2>Gastos Fijos</h2>
+                <form id="form-gasto-fijo">
+                    <input type="text" id="tipo-gasto-fijo" placeholder="Tipo de gasto" required>
+                    <input type="text" id="descripcion-fijo" placeholder="Descripción del gasto" required>
+                    <input type="number" id="monto-fijo" placeholder="Monto" step="0.01" required>
+                    <input type="date" id="fecha-fijo" required>
+                    <button type="submit">Agregar Gasto Fijo</button>
+                </form>
+                <ul id="lista-gastos-fijos"></ul>
+            </div>
+
+            <!-- Columna de Gastos Diarios -->
+            <div class="columna">
+                <h2>Gastos Diarios</h2>
+                <form id="form-gasto-diario">
+                    <input type="text" id="descripcion-diario" placeholder="Descripción del gasto" required>
+                    <input type="number" id="monto-diario" placeholder="Monto" step="0.01" required>
+                    <input type="date" id="fecha-diario" required>
+                    <button type="submit">Agregar Gasto Diario</button>
+                </form>
+                <ul id="lista-gastos-diarios"></ul>
+            </div>
+        </div>
+
+        <!-- Sección de Estadísticas -->
+        <section class="seccion-estadisticas">
+            <button id="btn-ver-gastos">Ver Estadísticas</button>
+            <div id="estadisticas" style="display: none;"></div>
+        </section>
+
+        <!-- Sección de Gráfico de Distribución -->
+        <section class="seccion-grafico">
+            <h2>Distribución de Gastos</h2>
+            <div class="grafico-container">
+                <canvas id="grafico-gastos"></canvas>
+            </div>
+        </section>
+
+        <!-- Sección de Historial de Gastos -->
+        <section class="seccion-historial">
+            <h2>Historial de Gastos</h2>
+            <div id="historialGastos" class="lista-historial"></div>
+        </section>
+
+        <section class="seccion-filtro-fecha">
+            <h2>Filtrar por Fecha</h2>
+            <div class="filtro-fecha">
+                <input type="date" id="fechaInicio" />
+                <input type="date" id="fechaFin" />
+                <button onclick="filtrarGastos()">Filtrar</button>
+                <button onclick="mostrarTodosLosGastos()">Mostrar Todos</button>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Control de Gastos. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+    <script src="config.js"></script>
+</body>
+</html> 

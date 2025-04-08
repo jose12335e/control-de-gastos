@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Registro de Gastos</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-form input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .auth-form button {
+            padding: 12px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .auth-form button:hover {
+            background-color: #1976D2;
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .toggle-form a {
+            color: #2196F3;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #f44336;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Registro de Gastos</h1>
+        
+        <!-- Formulario de Login -->
+        <form id="login-form" class="auth-form">
+            <h2>Iniciar Sesión</h2>
+            <input type="email" id="login-email" placeholder="Correo electrónico" required>
+            <input type="password" id="login-password" placeholder="Contraseña" required>
+            <button type="submit">Iniciar Sesión</button>
+            <div id="login-error" class="error-message"></div>
+            <div class="toggle-form">
+                ¿No tienes cuenta? <a onclick="toggleForms()">Regístrate</a>
+            </div>
+        </form>
+
+        <!-- Formulario de Registro -->
+        <form id="register-form" class="auth-form" style="display: none;">
+            <h2>Registro</h2>
+            <input type="text" id="register-name" placeholder="Nombre completo" required>
+            <input type="email" id="register-email" placeholder="Correo electrónico" required>
+            <input type="password" id="register-password" placeholder="Contraseña" required>
+            <input type="password" id="register-confirm-password" placeholder="Confirmar contraseña" required>
+            <button type="submit">Registrarse</button>
+            <div id="register-error" class="error-message"></div>
+            <div class="toggle-form">
+                ¿Ya tienes cuenta? <a onclick="toggleForms()">Inicia sesión</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Función para alternar entre formularios
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'flex';
+                registerForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'flex';
+            }
+        }
+
+        // Manejar el registro
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const errorDiv = document.getElementById('register-error');
+
+            // Validaciones
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Las contraseñas no coinciden';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Obtener usuarios existentes
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Verificar si el email ya existe
+            if (users.some(user => user.email === email)) {
+                errorDiv.textContent = 'Este correo electrónico ya está registrado';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Crear nuevo usuario
+            const newUser = {
+                name,
+                email,
+                password,
+                sueldo: 0,
+                gastosFijos: [],
+                gastos: []
+            };
+
+            // Guardar usuario
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Guardar usuario actual
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+            // Redirigir a la página principal
+            window.location.href = 'index.html';
+        });
+
+        // Manejar el login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            // Obtener usuarios
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Buscar usuario
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                errorDiv.textContent = 'Correo electrónico o contraseña incorrectos';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Guardar usuario actual
+            localStorage.setItem('currentUser', JSON.stringify(user));
+
+            // Redirigir a la página principal
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html> 
