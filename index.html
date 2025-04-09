@@ -3,11 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Gastos - Inicio de Sesión</title>
+    
+    <!-- Metadatos para SEO -->
+    <title>Control de Gastos - Aplicación para gestionar tus finanzas personales</title>
+    <meta name="description" content="Control de Gastos es una aplicación web gratuita para gestionar tus finanzas personales. Registra gastos fijos y diarios, visualiza estadísticas y mantén el control de tu presupuesto.">
+    <meta name="keywords" content="control de gastos, finanzas personales, presupuesto, gestión financiera, gastos fijos, gastos diarios, ahorro, economía personal">
+    <meta name="author" content="Control de Gastos">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Metadatos para redes sociales (Open Graph) -->
+    <meta property="og:title" content="Control de Gastos - Aplicación para gestionar tus finanzas personales">
+    <meta property="og:description" content="Control de Gastos es una aplicación web gratuita para gestionar tus finanzas personales. Registra gastos fijos y diarios, visualiza estadísticas y mantén el control de tu presupuesto.">
+    <meta property="og:image" content="https://tudominio.com/images/control-gastos-preview.jpg">
+    <meta property="og:url" content="https://tudominio.com">
+    <meta property="og:type" content="website">
+    
+    <!-- Metadatos para Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Control de Gastos - Aplicación para gestionar tus finanzas personales">
+    <meta name="twitter:description" content="Control de Gastos es una aplicación web gratuita para gestionar tus finanzas personales. Registra gastos fijos y diarios, visualiza estadísticas y mantén el control de tu presupuesto.">
+    <meta name="twitter:image" content="https://tudominio.com/images/control-gastos-preview.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://tudominio.com">
+    
+    <!-- Estilos -->
     <link rel="stylesheet" href="styles.css">
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Schema.org markup para Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Control de Gastos",
+      "description": "Aplicación web para gestionar finanzas personales, registrar gastos y visualizar estadísticas",
+      "url": "https://tudominio.com",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -18,132 +66,117 @@
             </button>
         </header>
         
-        <!-- Formulario de Inicio de Sesión -->
-        <section class="seccion-login">
-            <h2>Iniciar Sesión</h2>
-            <form id="form-login">
-                <input type="email" id="email-login" placeholder="Correo electrónico" required>
-                <input type="password" id="password-login" placeholder="Contraseña" required>
-                <button type="submit">Iniciar Sesión</button>
-            </form>
-            
-            <div class="separador">
-                <span>o</span>
-            </div>
-            
-            <div class="auth-buttons">
-                <button id="btn-google" class="btn-social">
-                    <img src="https://www.google.com/favicon.ico" alt="Google" class="icono-social">
-                    Continuar con Google
-                </button>
-                <button id="btn-telefono" class="btn-social">
-                    <img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Teléfono" class="icono-social">
-                    Continuar con Teléfono
-                </button>
-            </div>
-            
-            <p>¿No tienes una cuenta? <a href="#" id="mostrar-registro">Regístrate aquí</a></p>
-        </section>
+        <main>
+            <!-- Formulario de Inicio de Sesión -->
+            <section class="seccion-login">
+                <h2>Iniciar Sesión</h2>
+                <form id="form-login">
+                    <div class="input-group">
+                        <label for="email-login">Correo electrónico:</label>
+                        <input type="email" id="email-login" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password-login">Contraseña:</label>
+                        <input type="password" id="password-login" placeholder="Tu contraseña" required>
+                    </div>
+                    <button type="submit" class="btn-primario">Iniciar Sesión</button>
+                </form>
+                
+                <div class="separador">
+                    <span>o</span>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button id="btn-google" class="btn-social">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="icono-social">
+                        Continuar con Google
+                    </button>
+                    <button id="btn-telefono" class="btn-social">
+                        <img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Teléfono" class="icono-social">
+                        Continuar con Teléfono
+                    </button>
+                </div>
+                
+                <p>¿No tienes una cuenta? <a href="#" id="mostrar-registro">Regístrate aquí</a></p>
+            </section>
 
-        <!-- Formulario de Registro (inicialmente oculto) -->
-        <section class="seccion-registro" style="display: none;">
-            <h2>Registro de Usuario</h2>
-            <form id="form-registro">
-                <input type="text" id="nombre-registro" placeholder="Nombre completo" required>
-                <input type="email" id="email-registro" placeholder="Correo electrónico" required>
-                <input type="password" id="password-registro" placeholder="Contraseña" required>
-                <input type="password" id="confirmar-password" placeholder="Confirmar contraseña" required>
-                <button type="submit">Registrarse</button>
-            </form>
+            <!-- Formulario de Registro (inicialmente oculto) -->
+            <section class="seccion-registro" style="display: none;">
+                <h2>Registro de Usuario</h2>
+                <form id="form-registro">
+                    <div class="input-group">
+                        <label for="nombre-registro">Nombre completo:</label>
+                        <input type="text" id="nombre-registro" placeholder="Tu nombre completo" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="email-registro">Correo electrónico:</label>
+                        <input type="email" id="email-registro" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password-registro">Contraseña:</label>
+                        <input type="password" id="password-registro" placeholder="Tu contraseña" required>
+                    </div>
+                    <button type="submit" class="btn-primario">Registrarse</button>
+                </form>
+                
+                <div class="separador">
+                    <span>o</span>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button id="btn-google-registro" class="btn-social">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="icono-social">
+                        Continuar con Google
+                    </button>
+                    <button id="btn-telefono-registro" class="btn-social">
+                        <img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Teléfono" class="icono-social">
+                        Continuar con Teléfono
+                    </button>
+                </div>
+                
+                <p>¿Ya tienes una cuenta? <a href="#" id="mostrar-login">Inicia sesión aquí</a></p>
+            </section>
             
-            <div class="separador">
-                <span>o</span>
-            </div>
+            <!-- Formulario de verificación por teléfono (inicialmente oculto) -->
+            <section class="seccion-telefono" style="display: none;">
+                <h2>Verificación por Teléfono</h2>
+                <form id="form-telefono">
+                    <div class="input-group">
+                        <label for="telefono">Número de teléfono:</label>
+                        <input type="tel" id="telefono" placeholder="+1 (809) 555-0123" required>
+                    </div>
+                    <button type="submit" class="btn-primario">Enviar código</button>
+                </form>
+                <button id="volver-login" class="btn-secundario">Volver al inicio de sesión</button>
+            </section>
             
-            <div class="auth-buttons">
-                <button id="btn-google-registro" class="btn-social">
-                    <img src="https://www.google.com/favicon.ico" alt="Google" class="icono-social">
-                    Registrarse con Google
-                </button>
-                <button id="btn-telefono-registro" class="btn-social">
-                    <img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Teléfono" class="icono-social">
-                    Registrarse con Teléfono
-                </button>
-            </div>
-            
-            <p>¿Ya tienes una cuenta? <a href="#" id="mostrar-login">Inicia sesión aquí</a></p>
-        </section>
+            <!-- Formulario de verificación de código (inicialmente oculto) -->
+            <section class="seccion-verificacion" style="display: none;">
+                <h2>Verificar Código</h2>
+                <form id="form-verificacion">
+                    <div class="input-group">
+                        <label for="codigo">Código de verificación:</label>
+                        <input type="text" id="codigo" placeholder="Ingresa el código recibido" required>
+                    </div>
+                    <button type="submit" class="btn-primario">Verificar</button>
+                </form>
+                <button id="volver-telefono" class="btn-secundario">Volver</button>
+            </section>
+        </main>
         
-        <!-- Formulario de verificación por teléfono (inicialmente oculto) -->
-        <section class="seccion-telefono" style="display: none;">
-            <h2>Verificación por Teléfono</h2>
-            <form id="form-telefono">
-                <div class="input-group">
-                    <label for="codigo-pais">Código de país:</label>
-                    <select id="codigo-pais">
-                        <option value="+52">México (+52)</option>
-                        <option value="+1">Estados Unidos (+1)</option>
-                        <option value="+34">España (+34)</option>
-                        <option value="+54">Argentina (+54)</option>
-                        <option value="+56">Chile (+56)</option>
-                        <option value="+57">Colombia (+57)</option>
-                        <option value="+58">Venezuela (+58)</option>
-                        <option value="+591">Bolivia (+591)</option>
-                        <option value="+593">Ecuador (+593)</option>
-                        <option value="+51">Perú (+51)</option>
-                        <option value="+55">Brasil (+55)</option>
-                        <option value="+598">Uruguay (+598)</option>
-                        <option value="+595">Paraguay (+595)</option>
-                        <option value="+506">Costa Rica (+506)</option>
-                        <option value="+502">Guatemala (+502)</option>
-                        <option value="+504">Honduras (+504)</option>
-                        <option value="+503">El Salvador (+503)</option>
-                        <option value="+505">Nicaragua (+505)</option>
-                        <option value="+507">Panamá (+507)</option>
-                        <option value="+593">Ecuador (+593)</option>
-                        <option value="+56">Chile (+56)</option>
-                        <option value="+57">Colombia (+57)</option>
-                        <option value="+58">Venezuela (+58)</option>
-                        <option value="+591">Bolivia (+591)</option>
-                        <option value="+593">Ecuador (+593)</option>
-                        <option value="+51">Perú (+51)</option>
-                        <option value="+55">Brasil (+55)</option>
-                        <option value="+598">Uruguay (+598)</option>
-                        <option value="+595">Paraguay (+595)</option>
-                        <option value="+506">Costa Rica (+506)</option>
-                        <option value="+502">Guatemala (+502)</option>
-                        <option value="+504">Honduras (+504)</option>
-                        <option value="+503">El Salvador (+503)</option>
-                        <option value="+505">Nicaragua (+505)</option>
-                        <option value="+507">Panamá (+507)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="telefono">Número de teléfono:</label>
-                    <input type="tel" id="telefono" placeholder="Número de teléfono" required>
-                </div>
-                <button type="submit" id="btn-enviar-codigo">Enviar código de verificación</button>
-            </form>
-            <p><a href="#" id="volver-login">Volver al inicio de sesión</a></p>
-        </section>
-        
-        <!-- Formulario de verificación de código (inicialmente oculto) -->
-        <section class="seccion-verificacion" style="display: none;">
-            <h2>Verificar Código</h2>
-            <form id="form-verificacion">
-                <div class="input-group">
-                    <label for="codigo-verificacion">Código de verificación:</label>
-                    <input type="text" id="codigo-verificacion" placeholder="Ingresa el código recibido" required>
-                </div>
-                <button type="submit" id="btn-verificar-codigo">Verificar</button>
-            </form>
-            <p><a href="#" id="volver-telefono">Volver</a></p>
-        </section>
+        <footer>
+            <p>&copy; 2024 Control de Gastos. Todos los derechos reservados.</p>
+            <nav class="footer-nav">
+                <a href="privacy.html">Política de Privacidad</a> | 
+                <a href="terms.html">Términos de Uso</a> | 
+                <a href="contact.html">Contacto</a>
+            </nav>
+        </footer>
     </div>
 
-    <!-- Script de autenticación -->
+    <!-- Scripts -->
     <script src="firebase-config.js"></script>
-    <script src="auth.js"></script>
     <script src="theme.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>

@@ -2,188 +2,272 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-translate="appTitle">Control de Gastos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Metadatos para SEO -->
+    <title>Control de Gastos - Panel de Control de Finanzas Personales</title>
+    <meta name="description" content="Panel de control para gestionar tus finanzas personales. Registra tu salario, gastos fijos y diarios, visualiza estadísticas detalladas y mantén el control de tu presupuesto mensual.">
+    <meta name="keywords" content="control de gastos, finanzas personales, presupuesto, gestión financiera, gastos fijos, gastos diarios, estadísticas financieras, ahorro, economía personal">
+    <meta name="author" content="Control de Gastos">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Metadatos para redes sociales (Open Graph) -->
+    <meta property="og:title" content="Control de Gastos - Panel de Control de Finanzas Personales">
+    <meta property="og:description" content="Panel de control para gestionar tus finanzas personales. Registra tu salario, gastos fijos y diarios, visualiza estadísticas detalladas y mantén el control de tu presupuesto mensual.">
+    <meta property="og:image" content="https://tudominio.com/images/control-gastos-dashboard.jpg">
+    <meta property="og:url" content="https://tudominio.com/app">
+    <meta property="og:type" content="website">
+    
+    <!-- Metadatos para Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Control de Gastos - Panel de Control de Finanzas Personales">
+    <meta name="twitter:description" content="Panel de control para gestionar tus finanzas personales. Registra tu salario, gastos fijos y diarios, visualiza estadísticas detalladas y mantén el control de tu presupuesto mensual.">
+    <meta name="twitter:image" content="https://tudominio.com/images/control-gastos-dashboard.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://tudominio.com/app">
+    
+    <!-- Estilos -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Schema.org markup para Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Control de Gastos - Panel de Control",
+      "description": "Panel de control para gestionar finanzas personales, registrar gastos y visualizar estadísticas detalladas",
+      "url": "https://tudominio.com/app",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
 </head>
 <body>
     <div class="container">
-        <header class="app-header">
-            <h1 data-translate="appTitle">Control de Gastos</h1>
-            <div class="user-info">
+        <header>
+            <h1>Control de Gastos</h1>
+            <div class="header-actions">
                 <button id="btn-cambio-tema" class="btn-tema" title="Cambiar tema">
                     <span class="icono-tema">🌙</span>
                 </button>
-                <span id="nombre-usuario">Usuario</span>
-                <button id="btn-cerrar-sesion" data-translate="logoutBtn">Cerrar Sesión</button>
+                <button id="btn-cerrar-sesion" class="btn-cerrar-sesion" title="Cerrar sesión">
+                    <span class="icono-cerrar">🚪</span>
+                </button>
             </div>
         </header>
         
-        <nav class="menu-principal">
-            <a href="app.html" class="activo" data-translate="homeLink">Inicio</a>
-            <a href="config.html" data-translate="configLink">Configuración</a>
-        </nav>
-        
-        <!-- Formulario para ingresar sueldo -->
-        <section class="seccion-sueldo">
-            <h2 data-translate="salaryTitle">Sueldo</h2>
-            <form id="form-sueldo">
-                <div class="input-group">
-                    <label for="sueldo" data-translate="salaryLabel">Ingrese su sueldo:</label>
-                    <input type="number" id="sueldo" placeholder="Ingresa tu sueldo" step="0.01" required>
-                </div>
-                <div class="input-group">
-                    <label for="moneda" data-translate="currencyLabel">Moneda:</label>
-                    <select id="moneda" required>
-                        <option value="USD">USD - Dólar Estadounidense</option>
-                        <option value="EUR">EUR - Euro</option>
-                        <option value="MXN">MXN - Peso Mexicano</option>
-                        <option value="COP">COP - Peso Colombiano</option>
-                        <option value="ARS">ARS - Peso Argentino</option>
-                        <option value="CLP">CLP - Peso Chileno</option>
-                        <option value="PEN">PEN - Sol Peruano</option>
-                        <option value="BRL">BRL - Real Brasileño</option>
-                        <option value="UYU">UYU - Peso Uruguayo</option>
-                        <option value="VES">VES - Bolívar Venezolano</option>
-                    </select>
-                </div>
-                <div class="fecha-cobro">
-                    <label for="dia-cobro" data-translate="paymentDayLabel">Día de cobro mensual:</label>
-                    <input type="number" id="dia-cobro" min="1" max="31" placeholder="Día del mes" required>
-                </div>
-                <button type="submit" data-translate="saveBtn">Actualizar Sueldo</button>
-            </form>
-            <div id="sueldo-restante">
-                <h2 data-translate="remainingSalary">Sueldo Restante: $0.00</h2>
-            </div>
-        </section>
-
-        <!-- Contenedor de columnas para gastos fijos y diarios -->
-        <div class="columnas-container">
-            <!-- Columna de Gastos Fijos -->
-            <div class="columna">
-                <h2 data-translate="fixedExpensesTitle">Gastos Fijos</h2>
-                <form id="form-gasto-fijo">
-                    <div class="input-group">
-                        <label for="categoria-gasto-fijo" data-translate="expenseCategoryLabel">Categoría:</label>
-                        <select id="categoria-gasto-fijo" required>
-                            <option value="" data-translate="selectCategory">Seleccione una categoría</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="subcategoria-gasto-fijo" data-translate="expenseSubcategoryLabel">Subcategoría:</label>
-                        <select id="subcategoria-gasto-fijo" required>
-                            <option value="" data-translate="selectSubcategory">Seleccione una subcategoría</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="descripcion-fijo" data-translate="descriptionLabel">Descripción (opcional):</label>
-                        <input type="text" id="descripcion-fijo" placeholder="(Opcional)">
-                    </div>
-                    <div class="input-group">
-                        <label for="monto-fijo" data-translate="amountLabel">Monto:</label>
-                        <input type="number" id="monto-fijo" placeholder="Monto" step="0.01" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="fecha-fijo" data-translate="dateLabel">Fecha:</label>
-                        <input type="date" id="fecha-fijo" required>
-                    </div>
-                    <button type="submit" data-translate="addBtn">Agregar Gasto Fijo</button>
-                </form>
-                <ul id="lista-gastos-fijos"></ul>
-            </div>
-
-            <!-- Columna de Gastos Diarios -->
-            <div class="columna">
-                <h2 data-translate="dailyExpensesTitle">Gastos Diarios</h2>
-                <form id="form-gasto-diario">
-                    <div class="input-group">
-                        <label for="categoria-gasto-diario" data-translate="expenseCategoryLabel">Categoría:</label>
-                        <select id="categoria-gasto-diario" required>
-                            <option value="" data-translate="selectCategory">Seleccione una categoría</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="subcategoria-gasto-diario" data-translate="expenseSubcategoryLabel">Subcategoría:</label>
-                        <select id="subcategoria-gasto-diario" required>
-                            <option value="" data-translate="selectSubcategory">Seleccione una subcategoría</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="descripcion-diario" data-translate="descriptionLabel">Descripción (opcional):</label>
-                        <input type="text" id="descripcion-diario" placeholder="(Opcional)">
-                    </div>
-                    <div class="input-group">
-                        <label for="monto-diario" data-translate="amountLabel">Monto:</label>
-                        <input type="number" id="monto-diario" placeholder="Monto" step="0.01" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="fecha-diario" data-translate="dateLabel">Fecha:</label>
-                        <input type="date" id="fecha-diario" required>
-                    </div>
-                    <button type="submit" data-translate="addBtn">Agregar Gasto Diario</button>
-                </form>
-                <ul id="lista-gastos-diarios"></ul>
-            </div>
+        <div class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="icono-inicio">🏠</span>
+                    <span class="texto-link">Inicio</span>
+                </a>
+                <a href="config.html" class="sidebar-link">
+                    <span class="icono-config">⚙️</span>
+                    <span class="texto-link">Configuración</span>
+                </a>
+            </nav>
         </div>
-
-        <!-- Sección de Estadísticas -->
-        <section class="seccion-estadisticas">
-            <button id="btn-ver-gastos" data-translate="viewStatisticsBtn">Ver Estadísticas</button>
-            <div id="estadisticas" style="display: none;"></div>
-        </section>
-
-        <!-- Sección de Gráfico de Distribución -->
-        <section class="seccion-grafico">
-            <h2 data-translate="distributionTitle">Distribución de Gastos</h2>
-            <div class="grafico-container">
-                <canvas id="grafico-gastos"></canvas>
-            </div>
-        </section>
-
-        <!-- Sección de Historial de Gastos -->
-        <section class="seccion-historial">
-            <h2 data-translate="historyTitle">Historial de Gastos</h2>
-            <div class="filtros-fecha">
-                <div class="input-group">
-                    <label for="fechaInicio" data-translate="startDateLabel">Fecha inicio:</label>
-                    <input type="date" id="fechaInicio">
+        
+        <main>
+            <!-- Formulario de Salario -->
+            <section class="seccion-salario">
+                <h2>Configuración de Salario</h2>
+                <form id="form-salario">
+                    <div class="input-group">
+                        <label for="salario">Salario Mensual:</label>
+                        <input type="number" id="salario" placeholder="Ingresa tu salario mensual" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dia-cobro">Día de Cobro</label>
+                        <input type="number" id="dia-cobro" min="1" max="31" placeholder="Día del mes" required>
+                        <small class="form-text">Ingresa el día del mes en que recibes tu salario (1-31)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha-sistema">Fecha del Sistema</label>
+                        <input type="date" id="fecha-sistema" required>
+                        <small class="form-text">Esta fecha se usará para controlar el cambio de mes</small>
+                    </div>
+                    <button type="submit">Guardar Salario</button>
+                </form>
+                <div class="salario-resumen">
+                    <h3>Resumen de Salario</h3>
+                    <div class="salario-tarjeta">
+                        <div class="salario-valor">
+                            <span class="etiqueta">Salario Mensual:</span>
+                            <span id="salario-resumen" class="valor">RD$ 0.00</span>
+                        </div>
+                        <div class="salario-fecha">
+                            <span class="etiqueta">Día de Cobro:</span>
+                            <span id="dia-cobro-resumen" class="valor">--</span>
+                        </div>
+                        <div class="fecha-sistema">
+                            <span class="etiqueta">Fecha Actual:</span>
+                            <span id="fecha-sistema-resumen" class="valor">--</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="fechaFin" data-translate="endDateLabel">Fecha fin:</label>
-                    <input type="date" id="fechaFin">
-                </div>
-                <button id="btnFiltrar" data-translate="filterBtn">Filtrar</button>
-                <button id="btnMostrarTodos" data-translate="showAllBtn">Mostrar Todos</button>
+            </section>
+
+            <!-- Contenedor de Gastos (Fijos y Diarios) -->
+            <div class="gastos-container">
+                <!-- Formulario de Gastos Fijos -->
+                <section class="seccion-gastos-fijos">
+                    <h2>Gastos Fijos Mensuales</h2>
+                    <form id="form-gastos-fijos">
+                        <div class="input-group">
+                            <label for="categoria-gasto-fijo">Categoría:</label>
+                            <select id="categoria-gasto-fijo" required>
+                                <option value="">Selecciona una categoría</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="subcategoria-gasto-fijo">Subcategoría:</label>
+                            <select id="subcategoria-gasto-fijo" required>
+                                <option value="">Selecciona una subcategoría</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="fecha-gasto-fijo">Fecha del Gasto:</label>
+                            <input type="date" id="fecha-gasto-fijo" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="monto-fijo">Monto:</label>
+                            <input type="number" id="monto-fijo" placeholder="Ingresa el monto" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="comentario-fijo">Comentario (opcional):</label>
+                            <textarea id="comentario-fijo" placeholder="Agrega un comentario sobre este gasto"></textarea>
+                        </div>
+                        <button type="submit">Agregar Gasto Fijo</button>
+                    </form>
+                </section>
+
+                <!-- Formulario de Gastos Diarios -->
+                <section class="seccion-gastos-diarios">
+                    <h2>Gastos Diarios</h2>
+                    <form id="form-gastos-diarios">
+                        <div class="input-group">
+                            <label for="categoria-gasto-diario">Categoría:</label>
+                            <select id="categoria-gasto-diario" required>
+                                <option value="">Selecciona una categoría</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="subcategoria-gasto-diario">Subcategoría:</label>
+                            <select id="subcategoria-gasto-diario" required>
+                                <option value="">Selecciona una subcategoría</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="fecha-gasto-diario">Fecha del Gasto:</label>
+                            <input type="date" id="fecha-gasto-diario" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="monto-diario">Monto:</label>
+                            <input type="number" id="monto-diario" placeholder="Ingresa el monto" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="comentario-diario">Comentario (opcional):</label>
+                            <textarea id="comentario-diario" placeholder="Agrega un comentario sobre este gasto"></textarea>
+                        </div>
+                        <button type="submit">Registrar Gasto Diario</button>
+                    </form>
+                </section>
             </div>
-            <div id="historialGastos" class="lista-historial"></div>
-        </section>
+
+            <!-- Sección de Estadísticas -->
+            <section class="seccion-estadisticas">
+                <h2>Estadísticas</h2>
+                <div class="estadisticas-container">
+                    <div class="estadistica">
+                        <h3>Salario</h3>
+                        <p id="salario-actual">RD$ 0.00</p>
+                    </div>
+                    <div class="estadistica">
+                        <h3>Gastos Fijos</h3>
+                        <p id="gastos-fijos-total">RD$ 0.00</p>
+                    </div>
+                    <div class="estadistica">
+                        <h3>Gastos Diarios</h3>
+                        <p id="gastos-diarios-total">RD$ 0.00</p>
+                    </div>
+                    <div class="estadistica">
+                        <h3>Total Gastos</h3>
+                        <p id="total-gastos">RD$ 0.00</p>
+                    </div>
+                    <div class="estadistica">
+                        <h3>Salario Restante</h3>
+                        <p id="salario-restante">RD$ 0.00</p>
+                    </div>
+                </div>
+                <div class="grafico-container">
+                    <canvas id="grafico-gastos"></canvas>
+                </div>
+            </section>
+
+            <!-- Sección de Historial de Gastos -->
+            <section class="historial-gastos">
+                <h2>Historial de Gastos</h2>
+                <div class="filtros-historial">
+                    <select id="filtro-tipo-gasto">
+                        <option value="todos">Todos los gastos</option>
+                        <option value="fijos">Gastos fijos</option>
+                        <option value="diarios">Gastos diarios</option>
+                    </select>
+                    <input type="month" id="filtro-mes" />
+                </div>
+                <div class="tabla-historial">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Categoría</th>
+                                <th>Subcategoría</th>
+                                <th>Monto</th>
+                                <th>Comentario</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historial-gastos-body">
+                            <!-- Los gastos se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 Control de Gastos. Todos los derechos reservados.</p>
+            <nav class="footer-nav">
+                <a href="privacy.html">Política de Privacidad</a> | 
+                <a href="terms.html">Términos de Uso</a> | 
+                <a href="contact.html">Contacto</a>
+            </nav>
+        </footer>
     </div>
-
-    <footer>
-        <p>&copy; 2024 Control de Gastos. Todos los derechos reservados.</p>
-    </footer>
-
     <!-- Scripts de la aplicación -->
-    <script src="translations.js"></script>
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
-    <script src="theme.js"></script>
     <script src="script.js"></script>
-    <script>
-        // Cargar el idioma guardado al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedLanguage = localStorage.getItem('language') || 'es';
-            changeLanguage(savedLanguage);
-            
-            // Mostrar el nombre de usuario
-            const nombreUsuario = document.getElementById('nombre-usuario');
-            if (nombreUsuario) {
-                const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual')) || {};
-                nombreUsuario.textContent = usuarioActual.nombre || 'Usuario';
-            }
-        });
-    </script>
+    <script src="theme.js"></script>
 </body>
 </html> 

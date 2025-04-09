@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Metadatos para SEO -->
+    <title>Contacto - Control de Gastos</title>
+    <meta name="description" content="Página de contacto de Control de Gastos. Ponte en contacto con nuestro equipo para consultas, sugerencias o soporte técnico.">
+    <meta name="keywords" content="contacto, control de gastos, soporte, ayuda, consultas, sugerencias">
+    <meta name="author" content="Control de Gastos">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Metadatos para redes sociales (Open Graph) -->
+    <meta property="og:title" content="Contacto - Control de Gastos">
+    <meta property="og:description" content="Página de contacto de Control de Gastos. Ponte en contacto con nuestro equipo para consultas, sugerencias o soporte técnico.">
+    <meta property="og:image" content="https://tudominio.com/images/control-gastos-preview.jpg">
+    <meta property="og:url" content="https://tudominio.com/contact.html">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://tudominio.com/contact.html">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Schema.org markup para Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Contacto - Control de Gastos",
+      "description": "Página de contacto de Control de Gastos. Ponte en contacto con nuestro equipo para consultas, sugerencias o soporte técnico.",
+      "url": "https://tudominio.com/contact.html",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+1-809-555-0123",
+        "contactType": "customer service",
+        "email": "soporte@controldegastos.com",
+        "areaServed": "DO",
+        "availableLanguage": ["Spanish", "English"]
+      }
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Control de Gastos</h1>
+            <nav class="main-nav">
+                <a href="index.html" class="btn-volver">Volver al inicio</a>
+                <button id="btn-cambio-tema" class="btn-tema" title="Cambiar tema">
+                    <span class="icono-tema">🌙</span>
+                </button>
+            </nav>
+        </header>
+        
+        <main class="contenido-contacto">
+            <h2>Contacto</h2>
+            <p class="descripcion-contacto">¿Tienes preguntas, sugerencias o necesitas ayuda? Estamos aquí para ayudarte. Completa el formulario a continuación y nos pondremos en contacto contigo lo antes posible.</p>
+            
+            <div class="contacto-container">
+                <div class="formulario-contacto">
+                    <form id="form-contacto">
+                        <div class="input-group">
+                            <label for="nombre">Nombre completo:</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="email">Correo electrónico:</label>
+                            <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="asunto">Asunto:</label>
+                            <select id="asunto" name="asunto" required>
+                                <option value="">Selecciona un asunto</option>
+                                <option value="consulta">Consulta general</option>
+                                <option value="soporte">Soporte técnico</option>
+                                <option value="sugerencia">Sugerencia</option>
+                                <option value="reporte">Reporte de error</option>
+                                <option value="privacidad">Política de privacidad</option>
+                                <option value="legal">Asuntos legales</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="mensaje">Mensaje:</label>
+                            <textarea id="mensaje" name="mensaje" placeholder="Escribe tu mensaje aquí..." rows="5" required></textarea>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="privacidad" name="privacidad" required>
+                                <span class="checkmark"></span>
+                                He leído y acepto la <a href="privacy.html">Política de Privacidad</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn-enviar">Enviar mensaje</button>
+                    </form>
+                </div>
+                
+                <div class="informacion-contacto">
+                    <h3>Información de contacto</h3>
+                    <div class="info-item">
+                        <span class="icono">📧</span>
+                        <div>
+                            <h4>Correo electrónico</h4>
+                            <p>soporte@controldegastos.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="icono">📞</span>
+                        <div>
+                            <h4>Teléfono</h4>
+                            <p>+1 (809) 555-0123</p>
+                            <p class="horario">Lunes a Viernes: 9:00 AM - 6:00 PM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="icono">📍</span>
+                        <div>
+                            <h4>Dirección</h4>
+                            <p>Av. Winston Churchill 1099</p>
+                            <p>Torre Citibank, Piso 18</p>
+                            <p>Santo Domingo, República Dominicana</p>
+                        </div>
+                    </div>
+                    
+                    <div class="redes-sociales">
+                        <h4>Síguenos en redes sociales</h4>
+                        <div class="iconos-redes">
+                            <a href="https://facebook.com/controldegastos" target="_blank" rel="noopener noreferrer" title="Facebook">
+                                <span class="icono-redes">📘</span>
+                            </a>
+                            <a href="https://twitter.com/controldegastos" target="_blank" rel="noopener noreferrer" title="Twitter">
+                                <span class="icono-redes">🐦</span>
+                            </a>
+                            <a href="https://instagram.com/controldegastos" target="_blank" rel="noopener noreferrer" title="Instagram">
+                                <span class="icono-redes">📸</span>
+                            </a>
+                            <a href="https://linkedin.com/company/controldegastos" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                                <span class="icono-redes">💼</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preguntas-frecuentes">
+                <h3>Preguntas frecuentes</h3>
+                <div class="acordeon">
+                    <div class="acordeon-item">
+                        <div class="acordeon-header">
+                            <h4>¿Cómo puedo restablecer mi contraseña?</h4>
+                            <span class="icono-acordeon">+</span>
+                        </div>
+                        <div class="acordeon-contenido">
+                            <p>Para restablecer tu contraseña, ve a la página de inicio de sesión y haz clic en "¿Olvidaste tu contraseña?". Ingresa tu correo electrónico y sigue las instrucciones enviadas a tu bandeja de entrada.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="acordeon-item">
+                        <div class="acordeon-header">
+                            <h4>¿Cómo puedo exportar mis datos financieros?</h4>
+                            <span class="icono-acordeon">+</span>
+                        </div>
+                        <div class="acordeon-contenido">
+                            <p>Puedes exportar tus datos financieros en formato CSV desde la sección de configuración de tu cuenta. Ve a "Configuración" > "Exportar datos" y selecciona el período que deseas exportar.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="acordeon-item">
+                        <div class="acordeon-header">
+                            <h4>¿Es seguro almacenar mi información financiera en la aplicación?</h4>
+                            <span class="icono-acordeon">+</span>
+                        </div>
+                        <div class="acordeon-contenido">
+                            <p>Sí, utilizamos tecnología de encriptación avanzada para proteger tus datos. Todos los datos se almacenan de forma segura en servidores de Firebase, propiedad de Google, y solo son accesibles mediante autenticación segura.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="acordeon-item">
+                        <div class="acordeon-header">
+                            <h4>¿Puedo usar la aplicación en múltiples dispositivos?</h4>
+                            <span class="icono-acordeon">+</span>
+                        </div>
+                        <div class="acordeon-contenido">
+                            <p>Sí, puedes acceder a tu cuenta desde cualquier dispositivo con conexión a internet. Tus datos se sincronizarán automáticamente entre todos tus dispositivos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 Control de Gastos. Todos los derechos reservados.</p>
+            <nav class="footer-nav">
+                <a href="privacy.html">Política de Privacidad</a> | 
+                <a href="terms.html">Términos de Uso</a> | 
+                <a href="contact.html">Contacto</a>
+            </nav>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="theme.js"></script>
+    <script>
+        // Script para el acordeón de preguntas frecuentes
+        document.addEventListener('DOMContentLoaded', function() {
+            const acordeonItems = document.querySelectorAll('.acordeon-item');
+            
+            acordeonItems.forEach(item => {
+                const header = item.querySelector('.acordeon-header');
+                
+                header.addEventListener('click', () => {
+                    const contenido = item.querySelector('.acordeon-contenido');
+                    const icono = item.querySelector('.icono-acordeon');
+                    
+                    // Cerrar todos los demás elementos
+                    acordeonItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.querySelector('.acordeon-contenido').style.display = 'none';
+                            otherItem.querySelector('.icono-acordeon').textContent = '+';
+                        }
+                    });
+                    
+                    // Alternar el elemento actual
+                    if (contenido.style.display === 'block') {
+                        contenido.style.display = 'none';
+                        icono.textContent = '+';
+                    } else {
+                        contenido.style.display = 'block';
+                        icono.textContent = '-';
+                    }
+                });
+            });
+            
+            // Manejar el envío del formulario de contacto
+            const formContacto = document.getElementById('form-contacto');
+            if (formContacto) {
+                formContacto.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Aquí iría el código para enviar el formulario
+                    // Por ahora, solo mostraremos un mensaje de éxito
+                    alert('¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.');
+                    formContacto.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

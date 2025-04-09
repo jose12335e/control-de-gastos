@@ -1,39 +1,39 @@
 // Variables globales
 let graficoGastos = null;
+let graficoGastosFijos = null;
+let graficoGastosDiarios = null;
+let usuarioActual = null;
+let ultimaFechaSistema = null;
+
+// Variables para el sistema de notificaciones
+let notificacionesActivas = false;
+let ultimaNotificacion = null;
 
 // Categorías predefinidas para gastos fijos
 const categoriasGastosFijos = [
     {
         nombre: "Vivienda",
-        subcategorias: ["Hipoteca o alquiler", "Impuestos sobre la propiedad", "Seguro de vivienda"]
-    },
-    {
-        nombre: "Servicios públicos",
-        subcategorias: ["Electricidad", "Agua", "Gas", "Internet", "Teléfono fijo"]
+        subcategorias: ["Alquiler", "Hipoteca", "Servicios básicos", "Mantenimiento"]
     },
     {
         nombre: "Transporte",
-        subcategorias: ["Pago de préstamo o arrendamiento de vehículo", "Seguro de automóvil", "Combustible", "Mantenimiento del vehículo"]
-    },
-    {
-        nombre: "Seguros",
-        subcategorias: ["Seguro de salud", "Seguro de vida", "Seguro de automóvil"]
-    },
-    {
-        nombre: "Educación",
-        subcategorias: ["Colegiaturas", "Material educativo"]
+        subcategorias: ["Combustible", "Transporte público", "Mantenimiento vehículo", "Seguro"]
     },
     {
         nombre: "Alimentación",
-        subcategorias: ["Despensa mensual"]
+        subcategorias: ["Supermercado", "Restaurantes", "Delivery", "Otros"]
     },
     {
-        nombre: "Entretenimiento y suscripciones",
-        subcategorias: ["Servicios de streaming (Netflix, Spotify, etc.)", "Gimnasio", "Suscripciones a revistas o periódicos"]
+        nombre: "Servicios",
+        subcategorias: ["Internet", "Teléfono", "TV por cable", "Otros servicios"]
     },
     {
-        nombre: "Otros gastos fijos",
-        subcategorias: ["Cuidado personal", "Gastos en mascotas", "Donaciones o aportaciones regulares"]
+        nombre: "Salud",
+        subcategorias: ["Seguro médico", "Medicamentos", "Consultas médicas", "Otros gastos de salud"]
+    },
+    {
+        nombre: "Educación",
+        subcategorias: ["Colegiatura", "Materiales", "Cursos", "Otros gastos educativos"]
     }
 ];
 
@@ -41,721 +41,871 @@ const categoriasGastosFijos = [
 const categoriasGastosDiarios = [
     {
         nombre: "Alimentación",
-        subcategorias: ["Desayuno", "Almuerzo", "Cena", "Snacks", "Bebidas", "Restaurantes"]
+        subcategorias: ["Desayuno", "Almuerzo", "Cena", "Snacks", "Bebidas"]
     },
     {
         nombre: "Transporte",
-        subcategorias: ["Transporte público", "Taxi/Uber", "Combustible", "Estacionamiento", "Peaje"]
+        subcategorias: ["Taxi", "Bus", "Metro", "Otros"]
     },
     {
         nombre: "Entretenimiento",
-        subcategorias: ["Cine", "Teatro", "Conciertos", "Deportes", "Juegos", "Otros eventos"]
+        subcategorias: ["Cine", "Teatro", "Deportes", "Otros"]
     },
     {
         nombre: "Compras",
-        subcategorias: ["Ropa", "Calzado", "Accesorios", "Regalos", "Artículos varios"]
+        subcategorias: ["Ropa", "Calzado", "Accesorios", "Otros"]
     },
     {
         nombre: "Salud",
-        subcategorias: ["Farmacia", "Consultas médicas", "Vitaminas", "Cuidado personal"]
-    },
-    {
-        nombre: "Servicios",
-        subcategorias: ["Lavandería", "Peluquería", "Spa", "Limpieza", "Reparaciones"]
-    },
-    {
-        nombre: "Otros gastos diarios",
-        subcategorias: ["Donaciones", "Propinas", "Gastos imprevistos"]
+        subcategorias: ["Farmacia", "Consultas", "Otros"]
     }
 ];
 
 // Elementos del DOM
-const formSueldo = document.getElementById('form-sueldo');
-const inputSueldo = document.getElementById('sueldo');
+const formSalario = document.getElementById('form-salario');
+const inputSalario = document.getElementById('salario');
 const inputDiaCobro = document.getElementById('dia-cobro');
-const selectMoneda = document.getElementById('moneda');
-const sueldoRestanteElement = document.getElementById('sueldo-restante').querySelector('h2');
+const salarioResumen = document.getElementById('salario-resumen');
+const diaCobroResumen = document.getElementById('dia-cobro-resumen');
 
-const formGastoFijo = document.getElementById('form-gasto-fijo');
-const categoriaGastoFijo = document.getElementById('categoria-gasto-fijo');
-const subcategoriaGastoFijo = document.getElementById('subcategoria-gasto-fijo');
-const inputDescripcionFijo = document.getElementById('descripcion-fijo');
-const inputMontoFijo = document.getElementById('monto-fijo');
-const inputFechaFijo = document.getElementById('fecha-fijo');
-const listaGastosFijos = document.getElementById('lista-gastos-fijos');
+let formGastosFijos;
+let formGastosDiarios;
+let categoriaGastoFijo;
+let subcategoriaGastoFijo;
+let inputMontoFijo;
+let inputComentarioFijo;
+let categoriaGastoDiario;
+let subcategoriaGastoDiario;
+let inputMontoDiario;
+let inputComentarioDiario;
 
-const formGastoDiario = document.getElementById('form-gasto-diario');
-const categoriaGastoDiario = document.getElementById('categoria-gasto-diario');
-const subcategoriaGastoDiario = document.getElementById('subcategoria-gasto-diario');
-const inputDescripcionDiario = document.getElementById('descripcion-diario');
-const inputMontoDiario = document.getElementById('monto-diario');
-const inputFechaDiario = document.getElementById('fecha-diario');
-const listaGastosDiarios = document.getElementById('lista-gastos-diarios');
-
-const btnVerGastos = document.getElementById('btn-ver-gastos');
-const estadisticasDiv = document.getElementById('estadisticas');
-
-// Elementos para el historial de gastos
-const filtroTipo = document.getElementById('filtro-tipo');
-const ordenarPor = document.getElementById('ordenar-por');
-const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros');
-const historialGastosDiv = document.getElementById('historial-gastos');
-
-// Obtener el usuario actual
-const usuario = obtenerUsuarioActual();
-if (!usuario) {
-    // Si no hay usuario autenticado, redirigir al login
-    window.location.href = 'index.html';
-}
-
-// Cargar datos del usuario
-let sueldo = usuario.sueldo || 0;
-let diaCobro = usuario.diaCobro || 1;
-let gastosFijos = usuario.gastosFijos || [];
-let gastosDiarios = usuario.gastosDiarios || [];
-
-// Cargar configuración del usuario
-let configuracion = {};
-if (window.formatearMoneda) {
-    // Si el archivo config.js está cargado, obtener la configuración
-    const configGuardada = localStorage.getItem(`config_${usuario.email}`);
-    if (configGuardada) {
-        configuracion = JSON.parse(configGuardada);
-    }
-}
-
-// Actualizar la interfaz con los datos del usuario
-inputSueldo.value = sueldo;
-inputDiaCobro.value = diaCobro;
-actualizarSueldoRestante();
-mostrarGastosFijos();
-mostrarGastosDiarios();
-actualizarGrafico();
-mostrarHistorialGastos(); // Mostrar el historial de gastos al cargar la página
-
-// Cargar la moneda guardada al iniciar
-document.addEventListener('DOMContentLoaded', () => {
-    const usuarioActual = obtenerUsuarioActual();
-    if (usuarioActual && usuarioActual.moneda) {
-        selectMoneda.value = usuarioActual.moneda;
-    }
+// Verificar autenticación al cargar la página
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("DOM cargado, inicializando aplicación...");
+    
+    // Inicializar elementos del DOM
+    formGastosFijos = document.getElementById('form-gastos-fijos');
+    formGastosDiarios = document.getElementById('form-gastos-diarios');
+    categoriaGastoFijo = document.getElementById('categoria-gasto-fijo');
+    subcategoriaGastoFijo = document.getElementById('subcategoria-gasto-fijo');
+    inputMontoFijo = document.getElementById('monto-fijo');
+    inputComentarioFijo = document.getElementById('comentario-fijo');
+    categoriaGastoDiario = document.getElementById('categoria-gasto-diario');
+    subcategoriaGastoDiario = document.getElementById('subcategoria-gasto-diario');
+    inputMontoDiario = document.getElementById('monto-diario');
+    inputComentarioDiario = document.getElementById('comentario-diario');
+    
+    // Inicializar categorías
+    inicializarCategorias();
+    
+    // Inicializar formulario de salario
+    inicializarFormularioSalario();
+    
+    // Configurar event listeners
+    configurarEventListeners();
+    
+    // Cargar datos del usuario
+    await cargarDatosUsuario();
 });
 
-// Event Listeners
-formSueldo.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const sueldo = parseFloat(inputSueldo.value);
-    const diaCobro = parseInt(inputDiaCobro.value);
-    const moneda = selectMoneda.value;
-
-    // Obtener usuario actual y actualizar sus datos
-    const usuarioActual = obtenerUsuarioActual();
-    if (usuarioActual) {
-        usuarioActual.sueldo = sueldo;
-        usuarioActual.diaCobro = diaCobro;
-        usuarioActual.moneda = moneda;
-        guardarUsuarioActual(usuarioActual);
-    }
-
-    actualizarSueldoRestante();
-    mostrarExito('Sueldo actualizado correctamente');
-});
-
-formGastoFijo.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const tipo = categoriaGastoFijo.value;
-    const subcategoria = subcategoriaGastoFijo.value;
-    const descripcion = inputDescripcionFijo.value;
-    const monto = parseFloat(inputMontoFijo.value);
-    const fecha = inputFechaFijo.value;
+// Función para inicializar las categorías
+function inicializarCategorias() {
+    console.log("Inicializando categorías...");
     
-    const nuevoGasto = {
-        id: Date.now().toString(),
-        tipo,
-        subcategoria,
-        descripcion,
-        monto,
-        fecha
-    };
-    
-    gastosFijos.push(nuevoGasto);
-    
-    // Guardar en el usuario actual
-    usuario.gastosFijos = gastosFijos;
-    guardarUsuarioActual(usuario);
-    
-    mostrarGastosFijos();
-    actualizarSueldoRestante();
-    actualizarGrafico();
-    mostrarHistorialGastos(); // Actualizar el historial de gastos
-    
-    // Limpiar formulario
-    formGastoFijo.reset();
-});
-
-formGastoDiario.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const tipo = categoriaGastoDiario.value;
-    const subcategoria = subcategoriaGastoDiario.value;
-    const descripcion = inputDescripcionDiario.value;
-    const monto = parseFloat(inputMontoDiario.value);
-    const fecha = inputFechaDiario.value;
-    
-    const nuevoGasto = {
-        id: Date.now().toString(),
-        tipo,
-        subcategoria,
-        descripcion,
-        monto,
-        fecha
-    };
-    
-    gastosDiarios.push(nuevoGasto);
-    
-    // Guardar en el usuario actual
-    usuario.gastosDiarios = gastosDiarios;
-    guardarUsuarioActual(usuario);
-    
-    mostrarGastosDiarios();
-    actualizarSueldoRestante();
-    actualizarGrafico();
-    mostrarHistorialGastos();
-    
-    // Limpiar formulario
-    formGastoDiario.reset();
-});
-
-btnVerGastos.addEventListener('click', () => {
-    mostrarEstadisticas();
-});
-
-// Event listener para el botón de aplicar filtros
-if (btnAplicarFiltros) {
-    btnAplicarFiltros.addEventListener('click', () => {
-        mostrarHistorialGastos();
-    });
-}
-
-// Funciones
-function actualizarSueldoRestante() {
-    const usuarioActual = obtenerUsuarioActual();
-    if (!usuarioActual) return;
-
-    const sueldo = usuarioActual.sueldo || 0;
-    const gastosFijos = usuarioActual.gastosFijos || [];
-    const gastosDiarios = usuarioActual.gastosDiarios || [];
-    const moneda = usuarioActual.moneda || 'DOP';
-
-    const totalGastosFijos = gastosFijos.reduce((total, gasto) => total + gasto.monto, 0);
-    const totalGastosDiarios = gastosDiarios.reduce((total, gasto) => total + gasto.monto, 0);
-    const sueldoRestante = sueldo - totalGastosFijos - totalGastosDiarios;
-
-    const simboloMoneda = obtenerSimboloMoneda(moneda);
-    sueldoRestanteElement.textContent = `Sueldo Restante: ${simboloMoneda}${sueldoRestante.toFixed(2)}`;
-}
-
-function mostrarGastosFijos() {
-    listaGastosFijos.innerHTML = '';
-    
-    gastosFijos.forEach(gasto => {
-        const li = document.createElement('li');
-        
-        // Usar la función de formateo de fecha si está disponible
-        const fechaFormateada = window.formatearFecha ? formatearFecha(gasto.fecha) : formatearFechaLocal(gasto.fecha);
-        
-        // Usar la función de formateo de moneda si está disponible
-        const montoFormateado = window.formatearMoneda ? formatearMoneda(gasto.monto) : `$${gasto.monto.toFixed(2)}`;
-        
-        li.innerHTML = `
-            <div class="gasto-item">
-                <div class="gasto-info">
-                    <span class="gasto-tipo">${gasto.tipo} - ${gasto.subcategoria}</span>
-                    <span class="gasto-descripcion">${gasto.descripcion}</span>
-                    <span class="gasto-fecha">${fechaFormateada}</span>
-                </div>
-                <div class="gasto-monto">${montoFormateado}</div>
-                <button class="btn-eliminar" data-id="${gasto.id}">×</button>
-            </div>
-        `;
-        
-        listaGastosFijos.appendChild(li);
-    });
-    
-    // Agregar event listeners para los botones de eliminar
-    document.querySelectorAll('.btn-eliminar').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = e.target.getAttribute('data-id');
-            eliminarGastoFijo(id);
-        });
-    });
-}
-
-function mostrarGastosDiarios() {
-    listaGastosDiarios.innerHTML = '';
-    
-    gastosDiarios.forEach(gasto => {
-        const li = document.createElement('li');
-        
-        // Usar la función de formateo de fecha si está disponible
-        const fechaFormateada = window.formatearFecha ? formatearFecha(gasto.fecha) : formatearFechaLocal(gasto.fecha);
-        
-        // Usar la función de formateo de moneda si está disponible
-        const montoFormateado = window.formatearMoneda ? formatearMoneda(gasto.monto) : `$${gasto.monto.toFixed(2)}`;
-        
-        li.innerHTML = `
-            <div class="gasto-item">
-                <div class="gasto-info">
-                    <span class="gasto-descripcion">${gasto.descripcion}</span>
-                    <span class="gasto-fecha">${fechaFormateada}</span>
-                </div>
-                <div class="gasto-monto">${montoFormateado}</div>
-                <button class="btn-eliminar" data-id="${gasto.id}">×</button>
-            </div>
-        `;
-        
-        listaGastosDiarios.appendChild(li);
-    });
-    
-    // Agregar event listeners para los botones de eliminar
-    document.querySelectorAll('.btn-eliminar').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = e.target.getAttribute('data-id');
-            eliminarGastoDiario(id);
-        });
-    });
-}
-
-function eliminarGastoFijo(id) {
-    gastosFijos = gastosFijos.filter(gasto => gasto.id !== id);
-    
-    // Guardar en el usuario actual
-    usuario.gastosFijos = gastosFijos;
-    guardarUsuarioActual(usuario);
-    
-    mostrarGastosFijos();
-    actualizarSueldoRestante();
-    actualizarGrafico();
-    mostrarHistorialGastos(); // Actualizar el historial de gastos
-}
-
-function eliminarGastoDiario(id) {
-    gastosDiarios = gastosDiarios.filter(gasto => gasto.id !== id);
-    
-    // Guardar en el usuario actual
-    usuario.gastosDiarios = gastosDiarios;
-    guardarUsuarioActual(usuario);
-    
-    mostrarGastosDiarios();
-    actualizarSueldoRestante();
-    actualizarGrafico();
-    mostrarHistorialGastos(); // Actualizar el historial de gastos
-}
-
-function mostrarEstadisticas() {
-    const usuarioActual = obtenerUsuarioActual();
-    if (!usuarioActual) return;
-
-    const gastosFijos = usuarioActual.gastosFijos || [];
-    const gastosDiarios = usuarioActual.gastosDiarios || [];
-    const sueldo = usuarioActual.sueldo || 0;
-    const moneda = usuarioActual.moneda || 'DOP';
-
-    const totalGastosFijos = gastosFijos.reduce((total, gasto) => total + gasto.monto, 0);
-    const totalGastosDiarios = gastosDiarios.reduce((total, gasto) => total + gasto.monto, 0);
-    const totalGastos = totalGastosFijos + totalGastosDiarios;
-    const sueldoRestante = sueldo - totalGastos;
-
-    // Calcular gastos por tipo
-    const gastosPorTipo = {};
-    gastosFijos.forEach(gasto => {
-        if (!gastosPorTipo[gasto.tipo]) {
-            gastosPorTipo[gasto.tipo] = 0;
-        }
-        gastosPorTipo[gasto.tipo] += gasto.monto;
-    });
-
-    const simboloMoneda = obtenerSimboloMoneda(moneda);
-
-    // Crear HTML para estadísticas
-    let html = `
-        <div class="estadisticas-container">
-            <div class="estadistica-general">
-                <h3>Resumen General</h3>
-                <p>Sueldo: ${simboloMoneda}${sueldo.toFixed(2)}</p>
-                <p>Gastos Fijos: ${simboloMoneda}${totalGastosFijos.toFixed(2)}</p>
-                <p>Gastos Diarios: ${simboloMoneda}${totalGastosDiarios.toFixed(2)}</p>
-                <p>Total Gastos: ${simboloMoneda}${totalGastos.toFixed(2)}</p>
-                <p>Sueldo Restante: ${simboloMoneda}${sueldoRestante.toFixed(2)}</p>
-            </div>
-            <div class="estadistica-tipos">
-                <h3>Gastos por Tipo</h3>
-    `;
-
-    // Agregar gastos por tipo
-    for (const tipo in gastosPorTipo) {
-        html += `<p>${tipo}: ${simboloMoneda}${gastosPorTipo[tipo].toFixed(2)}</p>`;
-    }
-
-    html += `
-            </div>
-        </div>
-    `;
-
-    estadisticasDiv.innerHTML = html;
-    estadisticasDiv.style.display = 'block';
-}
-
-function actualizarGrafico() {
-    // Calcular gastos por tipo
-    const gastosPorTipo = {};
-    gastosFijos.forEach(gasto => {
-        if (!gastosPorTipo[gasto.tipo]) {
-            gastosPorTipo[gasto.tipo] = 0;
-        }
-        gastosPorTipo[gasto.tipo] += gasto.monto;
-    });
-    
-    // Agregar gastos diarios como una categoría
-    const gastosDiariosTotal = gastosDiarios.reduce((total, gasto) => total + gasto.monto, 0);
-    if (gastosDiariosTotal > 0) {
-        gastosPorTipo['Gastos Diarios'] = gastosDiariosTotal;
-    }
-    
-    // Agregar sueldo restante como una categoría
-    const gastosFijosTotal = gastosFijos.reduce((total, gasto) => total + gasto.monto, 0);
-    const sueldoRestante = sueldo - gastosFijosTotal - gastosDiariosTotal;
-    if (sueldoRestante > 0) {
-        gastosPorTipo['Sueldo Restante'] = sueldoRestante;
-    }
-    
-    // Preparar datos para el gráfico
-    const labels = Object.keys(gastosPorTipo);
-    const data = Object.values(gastosPorTipo);
-    const backgroundColors = labels.map(() => getColorAleatorio());
-    
-    // Destruir el gráfico anterior si existe
-    if (graficoGastos) {
-        graficoGastos.destroy();
-    }
-    
-    // Crear nuevo gráfico
-    const ctx = document.getElementById('grafico-gastos').getContext('2d');
-    graficoGastos = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: backgroundColors
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'right'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = Math.round((value / total) * 100);
-                            
-                            // Usar la función de formateo de moneda si está disponible
-                            const formatearMonto = window.formatearMoneda ? formatearMoneda : (valor) => `$${valor.toFixed(2)}`;
-                            
-                            return `${label}: ${formatearMonto(value)} (${percentage}%)`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-function getColorAleatorio() {
-    const letras = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letras[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-function verificarDiaCobro() {
-    const hoy = new Date();
-    const diaActual = hoy.getDate();
-    
-    if (diaActual === diaCobro) {
-        // Es día de cobro, resetear sueldo
-        sueldo = parseFloat(inputSueldo.value);
-        
-        // Guardar en el usuario actual
-        usuario.sueldo = sueldo;
-        guardarUsuarioActual(usuario);
-        
-        actualizarSueldoRestante();
-        actualizarGrafico();
-        
-        mostrarExito(`¡Es día de cobro! Tu sueldo ha sido actualizado.`);
-    }
-}
-
-// Verificar día de cobro al cargar la página
-verificarDiaCobro();
-
-// Verificar día de cobro cada día a medianoche
-setInterval(() => {
-    const ahora = new Date();
-    if (ahora.getHours() === 0 && ahora.getMinutes() === 0) {
-        verificarDiaCobro();
-    }
-}, 60000); // Verificar cada minuto
-
-// Funciones auxiliares
-function mostrarExito(mensaje) {
-    alert(mensaje);
-}
-
-function mostrarError(mensaje) {
-    alert(mensaje);
-}
-
-// Función para obtener el usuario actual
-function obtenerUsuarioActual() {
-    return JSON.parse(localStorage.getItem('usuarioActual'));
-}
-
-// Función para guardar el usuario actual
-function guardarUsuarioActual(usuario) {
-    localStorage.setItem('usuarioActual', JSON.stringify(usuario));
-}
-
-// Función para mostrar el historial de gastos
-function mostrarHistorialGastos() {
-    const historialDiv = document.getElementById('historialGastos');
-    if (!historialDiv) return;
-
-    // Combinar todos los gastos
-    const todosLosGastos = [
-        ...gastosFijos.map(gasto => ({...gasto, tipo: 'Fijo'})),
-        ...gastosDiarios.map(gasto => ({...gasto, tipo: 'Diario'}))
-    ];
-
-    // Ordenar por fecha (más reciente primero)
-    todosLosGastos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-    // Limpiar el contenedor
-    historialDiv.innerHTML = '';
-
-    if (todosLosGastos.length === 0) {
-        historialDiv.innerHTML = '<p class="mensaje-sin-gastos">No hay gastos registrados</p>';
+    if (!categoriaGastoFijo || !categoriaGastoDiario) {
+        console.error("No se encontraron los elementos de categorías en el DOM");
         return;
     }
-
-    // Mostrar cada gasto
-    todosLosGastos.forEach(gasto => {
-        const fechaFormateada = window.formatearFecha ? formatearFecha(gasto.fecha) : formatearFechaLocal(gasto.fecha);
-        const montoFormateado = window.formatearMoneda ? formatearMoneda(gasto.monto) : `$${gasto.monto.toFixed(2)}`;
-        
-        const gastoElement = document.createElement('div');
-        gastoElement.className = 'historial-item';
-        gastoElement.innerHTML = `
-            <div class="historial-info">
-                <span class="historial-fecha">${fechaFormateada}</span>
-                <span class="historial-tipo">${gasto.tipo}</span>
-                <span class="historial-descripcion">${gasto.tipo === 'Fijo' ? `${gasto.tipo}: ${gasto.descripcion}` : gasto.descripcion}</span>
-                <span class="historial-monto">${montoFormateado}</span>
-            </div>
-        `;
-        
-        historialDiv.appendChild(gastoElement);
-    });
-}
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Cargar categorías al iniciar
-    cargarCategorias();
     
-    // Event listeners para cambios en las categorías
-    categoriaGastoFijo.addEventListener('change', (e) => {
-        cargarSubcategoriasFijos(e.target.value);
-    });
+    // Limpiar opciones existentes
+    categoriaGastoFijo.innerHTML = '<option value="">Selecciona una categoría</option>';
+    categoriaGastoDiario.innerHTML = '<option value="">Selecciona una categoría</option>';
     
-    categoriaGastoDiario.addEventListener('change', (e) => {
-        cargarSubcategoriasDiarios(e.target.value);
-    });
-
-    // Event listeners para filtros de fecha
-    const btnFiltrar = document.getElementById('btnFiltrar');
-    const btnMostrarTodos = document.getElementById('btnMostrarTodos');
-    
-    if (btnFiltrar) {
-        btnFiltrar.addEventListener('click', filtrarGastos);
-    }
-    
-    if (btnMostrarTodos) {
-        btnMostrarTodos.addEventListener('click', mostrarTodosLosGastos);
-    }
-});
-
-// Función para cargar las categorías
-function cargarCategorias() {
-    // Limpiar selectores
-    categoriaGastoFijo.innerHTML = '<option value="" data-translate="selectCategory">Seleccione una categoría</option>';
-    subcategoriaGastoFijo.innerHTML = '<option value="" data-translate="selectSubcategory">Seleccione una subcategoría</option>';
-    categoriaGastoDiario.innerHTML = '<option value="" data-translate="selectCategory">Seleccione una categoría</option>';
-    subcategoriaGastoDiario.innerHTML = '<option value="" data-translate="selectSubcategory">Seleccione una subcategoría</option>';
-
-    // Cargar categorías de gastos fijos
+    // Llenar categorías de gastos fijos
     categoriasGastosFijos.forEach(categoria => {
         const option = document.createElement('option');
         option.value = categoria.nombre;
         option.textContent = categoria.nombre;
         categoriaGastoFijo.appendChild(option);
     });
-
-    // Cargar categorías de gastos diarios
+    
+    // Llenar categorías de gastos diarios
     categoriasGastosDiarios.forEach(categoria => {
         const option = document.createElement('option');
         option.value = categoria.nombre;
         option.textContent = categoria.nombre;
         categoriaGastoDiario.appendChild(option);
     });
+    
+    // Event listeners para cambios en categorías
+    categoriaGastoFijo.addEventListener('change', () => {
+        const categoriaSeleccionada = categoriaGastoFijo.value;
+        cargarSubcategoriasFijos(categoriaSeleccionada);
+    });
+    
+    categoriaGastoDiario.addEventListener('change', () => {
+        const categoriaSeleccionada = categoriaGastoDiario.value;
+        cargarSubcategoriasDiarios(categoriaSeleccionada);
+    });
+    
+    console.log("Categorías inicializadas correctamente");
 }
 
 // Función para cargar subcategorías de gastos fijos
 function cargarSubcategoriasFijos(categoriaSeleccionada) {
-    subcategoriaGastoFijo.innerHTML = '<option value="" data-translate="selectSubcategory">Seleccione una subcategoría</option>';
+    console.log("Cargando subcategorías para gastos fijos:", categoriaSeleccionada);
     
-    if (!categoriaSeleccionada) return;
-
+    if (!subcategoriaGastoFijo) {
+        console.error("No se encontró el elemento de subcategorías de gastos fijos");
+        return;
+    }
+    
+    // Limpiar opciones actuales
+    subcategoriaGastoFijo.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+    
+    // Encontrar la categoría seleccionada
     const categoria = categoriasGastosFijos.find(cat => cat.nombre === categoriaSeleccionada);
-    if (categoria && categoria.subcategorias) {
+    if (categoria) {
+        // Agregar las subcategorías correspondientes
         categoria.subcategorias.forEach(subcategoria => {
             const option = document.createElement('option');
             option.value = subcategoria;
             option.textContent = subcategoria;
             subcategoriaGastoFijo.appendChild(option);
         });
+        console.log("Subcategorías cargadas:", categoria.subcategorias);
+    } else {
+        console.warn("No se encontró la categoría seleccionada:", categoriaSeleccionada);
     }
 }
 
 // Función para cargar subcategorías de gastos diarios
 function cargarSubcategoriasDiarios(categoriaSeleccionada) {
-    subcategoriaGastoDiario.innerHTML = '<option value="" data-translate="selectSubcategory">Seleccione una subcategoría</option>';
+    console.log("Cargando subcategorías para gastos diarios:", categoriaSeleccionada);
     
-    if (!categoriaSeleccionada) return;
-
+    if (!subcategoriaGastoDiario) {
+        console.error("No se encontró el elemento de subcategorías de gastos diarios");
+        return;
+    }
+    
+    // Limpiar opciones actuales
+    subcategoriaGastoDiario.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+    
+    // Encontrar la categoría seleccionada
     const categoria = categoriasGastosDiarios.find(cat => cat.nombre === categoriaSeleccionada);
-    if (categoria && categoria.subcategorias) {
+    if (categoria) {
+        // Agregar las subcategorías correspondientes
         categoria.subcategorias.forEach(subcategoria => {
             const option = document.createElement('option');
             option.value = subcategoria;
             option.textContent = subcategoria;
             subcategoriaGastoDiario.appendChild(option);
         });
+        console.log("Subcategorías cargadas:", categoria.subcategorias);
+    } else {
+        console.warn("No se encontró la categoría seleccionada:", categoriaSeleccionada);
     }
 }
 
-// Función local para formatear fecha (si no está disponible la función global)
-function formatearFechaLocal(fecha) {
-    const fechaObj = new Date(fecha);
-    return fechaObj.toLocaleDateString();
-}
-
-// Función para filtrar gastos por fecha
-function filtrarGastos() {
-    const fechaInicio = document.getElementById('fechaInicio').value;
-    const fechaFin = document.getElementById('fechaFin').value;
+// Función para inicializar el formulario de salario
+function inicializarFormularioSalario() {
+    console.log("Inicializando formulario de salario...");
     
-    if (!fechaInicio || !fechaFin) {
-        alert('Por favor, selecciona un rango de fechas');
+    if (!formSalario || !inputDiaCobro) {
+        console.error("No se encontraron los elementos del formulario de salario");
         return;
     }
     
-    const fechaInicioObj = new Date(fechaInicio);
-    const fechaFinObj = new Date(fechaFin);
+    // Establecer la fecha actual en el campo de fecha del sistema
+    const fechaSistema = document.getElementById('fecha-sistema');
+    if (fechaSistema) {
+        const hoy = new Date();
+        fechaSistema.value = hoy.toISOString().split('T')[0];
+        ultimaFechaSistema = hoy;
+    }
     
-    // Combinar todos los gastos
-    const todosLosGastos = [
-        ...gastosFijos.map(gasto => ({...gasto, tipo: 'Fijo'})),
-        ...gastosDiarios.map(gasto => ({...gasto, tipo: 'Diario'}))
-    ];
+    // Event listener para el formulario de salario
+    formSalario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const salario = parseFloat(document.getElementById('salario').value);
+        const diaCobro = parseInt(document.getElementById('dia-cobro').value);
+        const fechaSistema = document.getElementById('fecha-sistema').value;
+        
+        if (isNaN(salario) || salario <= 0) {
+            mostrarMensaje('Por favor, ingresa un salario válido', 'error');
+            return;
+        }
+        
+        if (isNaN(diaCobro) || diaCobro < 1 || diaCobro > 31) {
+            mostrarMensaje('Por favor, ingresa un día de cobro válido (1-31)', 'error');
+            return;
+        }
+        
+        try {
+            await guardarSalario(salario, diaCobro, fechaSistema);
+            mostrarMensaje('Salario guardado correctamente', 'success');
+            
+            // Actualizar la variable global
+            if (usuarioActual) {
+                usuarioActual.salario = salario;
+                usuarioActual.diaCobro = diaCobro;
+                usuarioActual.ultimaFechaSistema = fechaSistema;
+            }
+        } catch (error) {
+            console.error('Error al guardar el salario:', error);
+            mostrarMensaje('Error al guardar el salario: ' + error.message, 'error');
+        }
+    });
+    
+    console.log("Formulario de salario inicializado correctamente");
+}
 
-    // Filtrar por fecha
-    const gastosFiltrados = todosLosGastos.filter(gasto => {
-        const fechaGasto = new Date(gasto.fecha);
-        return fechaGasto >= fechaInicioObj && fechaGasto <= fechaFinObj;
+// Función para verificar el cambio de mes
+async function verificarCambioMes(fechaActual) {
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario || !usuario.ultimaFechaSistema) return;
+    
+    const ultimaFecha = new Date(usuario.ultimaFechaSistema);
+    const nuevaFecha = new Date(fechaActual);
+    
+    // Verificar si ha cambiado el mes
+    if (ultimaFecha.getMonth() !== nuevaFecha.getMonth() || 
+        ultimaFecha.getFullYear() !== nuevaFecha.getFullYear()) {
+        
+        // 1. Guardar gastos del mes anterior en el historial
+        const nombreMesAnterior = ultimaFecha.toLocaleDateString('es-ES', { 
+            month: 'long', 
+            year: 'numeric' 
+        });
+        
+        const historialMes = {
+            nombre: nombreMesAnterior,
+            gastosFijos: usuario.gastosFijos || [],
+            gastosDiarios: usuario.gastosDiarios || [],
+            salarioInicial: usuario.salario || 0,
+            salarioRestante: usuario.salario - calcularTotalGastos(usuario)
+        };
+        
+        // Inicializar el array de historial si no existe
+        if (!usuario.historialMensual) {
+            usuario.historialMensual = [];
+        }
+        
+        // Agregar el mes al historial
+        usuario.historialMensual.push(historialMes);
+        
+        // 2. Reiniciar el salario restante
+        usuario.salarioRestante = usuario.salario;
+        
+        // 3. Vaciar las listas de gastos
+        usuario.gastosFijos = [];
+        usuario.gastosDiarios = [];
+        
+        // Actualizar la última fecha del sistema
+        usuario.ultimaFechaSistema = fechaActual;
+        
+        // Guardar los cambios en Firebase
+        if (window.db && usuario.uid) {
+            await window.db.collection('usuarios').doc(usuario.uid).update({
+                historialMensual: usuario.historialMensual,
+                gastosFijos: usuario.gastosFijos,
+                gastosDiarios: usuario.gastosDiarios,
+                salarioRestante: usuario.salarioRestante,
+                ultimaFechaSistema: usuario.ultimaFechaSistema,
+                ultimaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        
+        // Actualizar localStorage
+        localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+        
+        // Actualizar la variable global
+        window.usuarioActual = usuario;
+        
+        // Actualizar la interfaz
+        await actualizarEstadisticas();
+        await actualizarHistorialGastos();
+        
+        mostrarMensaje(`Se ha iniciado un nuevo mes: ${nombreMesAnterior}`, 'success');
+    }
+}
+
+// Función auxiliar para calcular el total de gastos
+function calcularTotalGastos(usuario) {
+    const gastosFijos = usuario.gastosFijos || [];
+    const gastosDiarios = usuario.gastosDiarios || [];
+    
+    const totalFijos = gastosFijos.reduce((total, gasto) => total + gasto.monto, 0);
+    const totalDiarios = gastosDiarios.reduce((total, gasto) => total + gasto.monto, 0);
+    
+    return totalFijos + totalDiarios;
+}
+
+// Función para configurar event listeners
+function configurarEventListeners() {
+    console.log("Configurando event listeners...");
+    
+    if (formGastosFijos) {
+        formGastosFijos.addEventListener('submit', guardarGastoFijo);
+        console.log("Event listener para gastos fijos configurado");
+    } else {
+        console.warn("No se encontró el formulario de gastos fijos");
+    }
+    
+    if (formGastosDiarios) {
+        formGastosDiarios.addEventListener('submit', guardarGastoDiario);
+        console.log("Event listener para gastos diarios configurado");
+    } else {
+        console.warn("No se encontró el formulario de gastos diarios");
+    }
+    
+    console.log("Event listeners configurados correctamente");
+}
+
+// Función para formatear moneda
+function formatearMoneda(valor) {
+    return new Intl.NumberFormat('es-DO', {
+        style: 'currency',
+        currency: 'DOP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(valor);
+}
+
+// Función para mostrar mensajes
+function mostrarMensaje(mensaje, tipo) {
+    console.log(`Mensaje (${tipo}):`, mensaje);
+    
+    const mensajeElement = document.createElement('div');
+    mensajeElement.className = `mensaje ${tipo}`;
+    mensajeElement.textContent = mensaje;
+    
+    document.body.appendChild(mensajeElement);
+    
+    setTimeout(() => {
+        mensajeElement.remove();
+    }, 3000);
+}
+
+// Función para actualizar estadísticas
+async function actualizarEstadisticas() {
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario) return;
+
+    // Actualizar resumen de salario
+    const salarioResumen = document.getElementById('salario-resumen');
+    const diaCobroResumen = document.getElementById('dia-cobro-resumen');
+    if (salarioResumen) salarioResumen.textContent = formatearMoneda(usuario.salario);
+    if (diaCobroResumen) diaCobroResumen.textContent = usuario.diaCobro;
+
+    // Calcular totales de gastos
+    const gastosFijos = usuario.gastosFijos || [];
+    const gastosDiarios = usuario.gastosDiarios || [];
+    
+    const totalGastosFijos = gastosFijos.reduce((total, gasto) => total + gasto.monto, 0);
+    const totalGastosDiarios = gastosDiarios.reduce((total, gasto) => total + gasto.monto, 0);
+    const totalGastos = totalGastosFijos + totalGastosDiarios;
+
+    // Actualizar elementos de estadísticas
+    const salarioActual = document.getElementById('salario-actual');
+    const gastosFijosTotal = document.getElementById('gastos-fijos-total');
+    const gastosDiariosTotal = document.getElementById('gastos-diarios-total');
+    const totalGastosElement = document.getElementById('total-gastos');
+    const salarioRestante = document.getElementById('salario-restante');
+
+    if (salarioActual) salarioActual.textContent = formatearMoneda(usuario.salario);
+    if (gastosFijosTotal) gastosFijosTotal.textContent = formatearMoneda(totalGastosFijos);
+    if (gastosDiariosTotal) gastosDiariosTotal.textContent = formatearMoneda(totalGastosDiarios);
+    if (totalGastosElement) totalGastosElement.textContent = formatearMoneda(totalGastos);
+    if (salarioRestante) salarioRestante.textContent = formatearMoneda(usuario.salario - totalGastos);
+
+    // Actualizar gráficos
+    actualizarGraficos(gastosFijos, gastosDiarios);
+}
+
+// Función para actualizar gráficos
+function actualizarGraficos(gastosFijos, gastosDiarios) {
+    // Agrupar todos los gastos por categoría
+    const gastosPorCategoria = {};
+    
+    // Agregar gastos fijos
+    gastosFijos.forEach(gasto => {
+        if (!gastosPorCategoria[gasto.categoria]) {
+            gastosPorCategoria[gasto.categoria] = 0;
+        }
+        gastosPorCategoria[gasto.categoria] += gasto.monto;
+    });
+    
+    // Agregar gastos diarios
+    gastosDiarios.forEach(gasto => {
+        if (!gastosPorCategoria[gasto.categoria]) {
+            gastosPorCategoria[gasto.categoria] = 0;
+        }
+        gastosPorCategoria[gasto.categoria] += gasto.monto;
     });
 
-    // Ordenar por fecha (más reciente primero)
-    gastosFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    // Preparar datos para el gráfico
+    const labels = Object.keys(gastosPorCategoria);
+    const data = Object.values(gastosPorCategoria);
 
-    // Mostrar gastos filtrados
-    mostrarGastosFiltradosEnHistorial(gastosFiltrados);
-}
-
-// Función para mostrar todos los gastos
-function mostrarTodosLosGastos() {
-    // Limpiar los filtros de fecha
-    document.getElementById('fechaInicio').value = '';
-    document.getElementById('fechaFin').value = '';
-    
-    // Mostrar todos los gastos
-    mostrarHistorialGastos();
-}
-
-// Función para mostrar gastos filtrados en el historial
-function mostrarGastosFiltradosEnHistorial(gastosFiltrados) {
-    const historialDiv = document.getElementById('historialGastos');
-    if (!historialDiv) return;
-
-    // Limpiar el contenedor
-    historialDiv.innerHTML = '';
-
-    if (gastosFiltrados.length === 0) {
-        historialDiv.innerHTML = '<p class="mensaje-sin-gastos">No hay gastos en el rango de fechas seleccionado</p>';
-        return;
+    // Crear el gráfico de pastel
+    const ctx = document.getElementById('grafico-gastos');
+    if (ctx) {
+        if (graficoGastos) {
+            graficoGastos.destroy();
+        }
+        graficoGastos = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribución de Gastos por Categoría'
+                    }
+                }
+            }
+        });
     }
+}
 
-    // Mostrar cada gasto
-    gastosFiltrados.forEach(gasto => {
-        const fechaFormateada = window.formatearFecha ? formatearFecha(gasto.fecha) : formatearFechaLocal(gasto.fecha);
-        const montoFormateado = window.formatearMoneda ? formatearMoneda(gasto.monto) : `$${gasto.monto.toFixed(2)}`;
+// Función para actualizar el historial de gastos
+async function actualizarHistorialGastos() {
+    const tbody = document.getElementById('historial-gastos-body');
+    const tipoFiltro = document.getElementById('filtro-tipo-gasto').value;
+    const mesFiltro = document.getElementById('filtro-mes').value;
+    
+    if (!tbody) return;
+    
+    // Limpiar la tabla
+    tbody.innerHTML = '';
+    
+    // Obtener usuario actual
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario) return;
+    
+    // Obtener todos los gastos
+    let gastos = [];
+    
+    // Agregar gastos fijos
+    if (tipoFiltro === 'todos' || tipoFiltro === 'fijos') {
+        const gastosFijos = usuario.gastosFijos || [];
+        gastosFijos.forEach(gasto => {
+            gastos.push({
+                ...gasto,
+                tipo: 'Fijo',
+                fecha: new Date(gasto.fecha)
+            });
+        });
+    }
+    
+    // Agregar gastos diarios
+    if (tipoFiltro === 'todos' || tipoFiltro === 'diarios') {
+        const gastosDiarios = usuario.gastosDiarios || [];
+        gastosDiarios.forEach(gasto => {
+            gastos.push({
+                ...gasto,
+                tipo: 'Diario',
+                fecha: new Date(gasto.fecha)
+            });
+        });
+    }
+    
+    // Filtrar por mes si se seleccionó uno
+    if (mesFiltro) {
+        const [year, month] = mesFiltro.split('-');
+        gastos = gastos.filter(gasto => {
+            const fecha = gasto.fecha;
+            return fecha.getFullYear() === parseInt(year) && 
+                   fecha.getMonth() === parseInt(month) - 1;
+        });
+    }
+    
+    // Ordenar por fecha (más reciente primero)
+    gastos.sort((a, b) => b.fecha - a.fecha);
+    
+    // Crear filas de la tabla
+    gastos.forEach(gasto => {
+        const tr = document.createElement('tr');
         
-        const gastoElement = document.createElement('div');
-        gastoElement.className = 'historial-item';
-        gastoElement.innerHTML = `
-            <div class="historial-info">
-                <span class="historial-fecha">${fechaFormateada}</span>
-                <span class="historial-tipo">${gasto.tipo}</span>
-                <span class="historial-descripcion">${gasto.tipo === 'Fijo' ? `${gasto.tipo}: ${gasto.descripcion}` : gasto.descripcion}</span>
-                <span class="historial-monto">${montoFormateado}</span>
-            </div>
+        // Formatear la fecha
+        const fecha = gasto.fecha.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        tr.innerHTML = `
+            <td>${fecha}</td>
+            <td>${gasto.tipo}</td>
+            <td>${gasto.categoria}</td>
+            <td>${gasto.subcategoria || '-'}</td>
+            <td>${formatearMoneda(gasto.monto)}</td>
+            <td>${gasto.comentario || '-'}</td>
         `;
         
-        historialDiv.appendChild(gastoElement);
+        tbody.appendChild(tr);
     });
 }
 
-// Función para obtener el símbolo de la moneda
-function obtenerSimboloMoneda(codigoMoneda) {
-    const simbolosMoneda = {
-        'USD': '$',
-        'EUR': '€',
-        'MXN': '$',
-        'COP': '$',
-        'ARS': '$',
-        'CLP': '$',
-        'PEN': 'S/',
-        'BRL': 'R$',
-        'UYU': '$U',
-        'VES': 'Bs',
-        'DOP': 'RD$'
-    };
-    return simbolosMoneda[codigoMoneda] || '$';
+// Agregar event listeners para los filtros
+document.addEventListener('DOMContentLoaded', () => {
+    const filtroTipo = document.getElementById('filtro-tipo');
+    const filtroMes = document.getElementById('filtro-mes');
+    
+    if (filtroTipo) {
+        filtroTipo.addEventListener('change', actualizarHistorialGastos);
+    }
+    
+    if (filtroMes) {
+        filtroMes.addEventListener('change', actualizarHistorialGastos);
+    }
+});
+
+// Función para guardar gasto fijo
+async function guardarGastoFijo(event) {
+    event.preventDefault();
+    
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario) {
+        mostrarMensaje('Debes iniciar sesión para guardar gastos', 'error');
+        return;
+    }
+    
+    const categoria = document.getElementById('categoria-gasto-fijo').value;
+    const subcategoria = document.getElementById('subcategoria-gasto-fijo').value;
+    const monto = parseFloat(document.getElementById('monto-fijo').value);
+    const comentario = document.getElementById('comentario-fijo').value;
+    const fecha = document.getElementById('fecha-gasto-fijo').value;
+    
+    if (!categoria || !subcategoria || isNaN(monto) || !fecha) {
+        mostrarMensaje('Por favor completa todos los campos requeridos', 'error');
+        return;
+    }
+    
+    try {
+        // Crear el objeto del gasto
+        const nuevoGasto = {
+            categoria,
+            subcategoria,
+            monto,
+            comentario,
+            fecha,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Inicializar el array de gastos fijos si no existe
+        if (!usuario.gastosFijos) {
+            usuario.gastosFijos = [];
+        }
+        
+        // Agregar el nuevo gasto
+        usuario.gastosFijos.push(nuevoGasto);
+        
+        // Actualizar en Firebase si está disponible
+        if (window.db && usuario.uid) {
+            await window.db.collection('usuarios').doc(usuario.uid).update({
+                gastosFijos: usuario.gastosFijos,
+                ultimaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        
+        // Actualizar en localStorage
+        localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+        
+        // Actualizar la variable global
+        window.usuarioActual = usuario;
+        
+        // Actualizar la interfaz
+        await actualizarEstadisticas();
+        await actualizarHistorialGastos();
+        
+        // Limpiar el formulario
+        document.getElementById('form-gastos-fijos').reset();
+        
+        mostrarMensaje('Gasto fijo guardado correctamente', 'success');
+    } catch (error) {
+        console.error('Error al guardar el gasto fijo:', error);
+        mostrarMensaje('Error al guardar el gasto fijo: ' + error.message, 'error');
+    }
+}
+
+// Función para guardar gasto diario
+async function guardarGastoDiario(event) {
+    event.preventDefault();
+    
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario) {
+        mostrarMensaje('Debes iniciar sesión para guardar gastos', 'error');
+        return;
+    }
+    
+    const categoria = document.getElementById('categoria-gasto-diario').value;
+    const subcategoria = document.getElementById('subcategoria-gasto-diario').value;
+    const monto = parseFloat(document.getElementById('monto-diario').value);
+    const comentario = document.getElementById('comentario-diario').value;
+    const fecha = document.getElementById('fecha-gasto-diario').value;
+    
+    if (!categoria || !subcategoria || isNaN(monto) || !fecha) {
+        mostrarMensaje('Por favor completa todos los campos requeridos', 'error');
+        return;
+    }
+    
+    try {
+        // Crear el objeto del gasto
+        const nuevoGasto = {
+            categoria,
+            subcategoria,
+            monto,
+            comentario,
+            fecha,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Inicializar el array de gastos diarios si no existe
+        if (!usuario.gastosDiarios) {
+            usuario.gastosDiarios = [];
+        }
+        
+        // Agregar el nuevo gasto
+        usuario.gastosDiarios.push(nuevoGasto);
+        
+        // Actualizar en Firebase si está disponible
+        if (window.db && usuario.uid) {
+            await window.db.collection('usuarios').doc(usuario.uid).update({
+                gastosDiarios: usuario.gastosDiarios,
+                ultimaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        
+        // Actualizar en localStorage
+        localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+        
+        // Actualizar la variable global
+        window.usuarioActual = usuario;
+        
+        // Actualizar la interfaz
+        await actualizarEstadisticas();
+        await actualizarHistorialGastos();
+        
+        // Limpiar el formulario
+        document.getElementById('form-gastos-diarios').reset();
+        
+        mostrarMensaje('Gasto diario guardado correctamente', 'success');
+    } catch (error) {
+        console.error('Error al guardar el gasto diario:', error);
+        mostrarMensaje('Error al guardar el gasto diario: ' + error.message, 'error');
+    }
+}
+
+// Función para cargar datos del usuario
+async function cargarDatosUsuario() {
+    console.log("Cargando datos del usuario...");
+    
+    try {
+        const usuario = await obtenerUsuarioActual();
+        if (!usuario) {
+            console.warn("No hay usuario actual para cargar datos");
+            return;
+        }
+        
+        // Actualizar la variable global
+        usuarioActual = usuario;
+        
+        // Actualizar salario y día de cobro
+        if (usuario.salario) {
+            inputSalario.value = usuario.salario;
+            salarioResumen.textContent = formatearMoneda(usuario.salario);
+        }
+        
+        if (usuario.diaCobro) {
+            const fecha = new Date();
+            fecha.setDate(usuario.diaCobro);
+            inputDiaCobro.value = fecha.toISOString().split('T')[0];
+            diaCobroResumen.textContent = usuario.diaCobro;
+        }
+        
+        // Actualizar estadísticas
+        await actualizarEstadisticas();
+        
+        console.log("Datos del usuario cargados correctamente");
+    } catch (error) {
+        console.error('Error al cargar datos del usuario:', error);
+        mostrarMensaje('Error al cargar los datos', 'error');
+    }
+}
+
+// Función para obtener usuario actual
+async function obtenerUsuarioActual() {
+    console.log("Obteniendo usuario actual...");
+    
+    // Verificar si hay un usuario en la variable global
+    if (window.usuarioActual) {
+        console.log("Usuario encontrado en variable global");
+        return window.usuarioActual;
+    }
+    
+    // Verificar si hay un usuario en localStorage
+    const usuarioLocalStorage = localStorage.getItem('usuarioActual');
+    if (usuarioLocalStorage) {
+        try {
+            const usuario = JSON.parse(usuarioLocalStorage);
+            console.log("Usuario encontrado en localStorage");
+            window.usuarioActual = usuario;
+            return usuario;
+        } catch (error) {
+            console.error("Error al parsear usuario de localStorage:", error);
+            localStorage.removeItem('usuarioActual');
+        }
+    }
+    
+    // Verificar si hay un usuario autenticado en Firebase
+    const auth = window.auth;
+    if (!auth) {
+        console.error('Firebase Auth no está disponible');
+        return null;
+    }
+    
+    const usuario = auth.currentUser;
+    if (!usuario) {
+        console.warn("No hay usuario autenticado en Firebase");
+        return null;
+    }
+    
+    try {
+        // Obtener datos del usuario desde Firestore
+        const usuarioRef = window.db.collection('usuarios').doc(usuario.uid);
+        const usuarioDoc = await usuarioRef.get();
+        
+        if (usuarioDoc.exists) {
+            const datosUsuario = usuarioDoc.data();
+            const usuarioCompleto = {
+                uid: usuario.uid,
+                email: usuario.email,
+                salario: datosUsuario.salario || 0,
+                diaCobro: datosUsuario.diaCobro || 1,
+                gastosFijos: datosUsuario.gastosFijos || [],
+                gastosDiarios: datosUsuario.gastosDiarios || [],
+                ultimaFechaSistema: datosUsuario.ultimaFechaSistema || null,
+                salarioRestante: datosUsuario.salarioRestante || 0
+            };
+            
+            // Guardar en localStorage y variable global
+            localStorage.setItem('usuarioActual', JSON.stringify(usuarioCompleto));
+            window.usuarioActual = usuarioCompleto;
+            
+            console.log("Usuario obtenido de Firestore");
+            return usuarioCompleto;
+        } else {
+            // Si el documento no existe, crearlo con valores por defecto
+            const nuevoUsuario = {
+                uid: usuario.uid,
+                email: usuario.email,
+                salario: 0,
+                diaCobro: 1,
+                gastosFijos: [],
+                gastosDiarios: [],
+                ultimaFechaSistema: null,
+                salarioRestante: 0
+            };
+            
+            await usuarioRef.set({
+                ...nuevoUsuario,
+                fechaCreacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Guardar en localStorage y variable global
+            localStorage.setItem('usuarioActual', JSON.stringify(nuevoUsuario));
+            window.usuarioActual = nuevoUsuario;
+            
+            console.log("Nuevo usuario creado en Firestore");
+            return nuevoUsuario;
+        }
+    } catch (error) {
+        console.error('Error al obtener datos del usuario:', error);
+        return null;
+    }
+}
+
+// Función para actualizar el resumen de salario
+function actualizarResumenSalario(salario, diaCobro) {
+    const salarioResumen = document.getElementById('salario-resumen');
+    const diaCobroResumen = document.getElementById('dia-cobro-resumen');
+    
+    if (salarioResumen && diaCobroResumen) {
+        salarioResumen.textContent = formatearMoneda(salario);
+        // Asegurarnos de que el día de cobro sea un número
+        const dia = parseInt(diaCobro);
+        diaCobroResumen.textContent = dia;
+    }
+}
+
+// Modificar la función guardarSalario para incluir la fecha del sistema
+async function guardarSalario(salario, diaCobro, fechaSistema) {
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario) {
+        throw new Error('No hay usuario autenticado');
+    }
+
+    try {
+        // Validar que el día de cobro sea un número entre 1 y 31
+        const dia = parseInt(diaCobro);
+        if (isNaN(dia) || dia < 1 || dia > 31) {
+            throw new Error('El día de cobro debe ser un número entre 1 y 31');
+        }
+
+        // Verificar cambio de mes
+        await verificarCambioMes(fechaSistema);
+
+        // Actualizar en Firebase si está disponible
+        if (window.db && usuario.uid) {
+            const usuarioRef = window.db.collection('usuarios').doc(usuario.uid);
+            await usuarioRef.update({
+                salario: salario,
+                diaCobro: dia,
+                ultimaFechaSistema: fechaSistema,
+                ultimaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } else {
+            // Si no hay Firebase, actualizar en localStorage
+            usuario.salario = salario;
+            usuario.diaCobro = dia;
+            usuario.ultimaFechaSistema = fechaSistema;
+            localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+        }
+
+        // Actualizar la variable global
+        window.usuarioActual = usuario;
+        window.usuarioActual.salario = salario;
+        window.usuarioActual.diaCobro = dia;
+        window.usuarioActual.ultimaFechaSistema = fechaSistema;
+
+        // Actualizar estadísticas
+        await actualizarEstadisticas();
+        
+        // Actualizar resumen de salario
+        actualizarResumenSalario(salario, dia);
+        
+        return true;
+    } catch (error) {
+        console.error('Error al guardar el salario:', error);
+        throw error;
+    }
 } 

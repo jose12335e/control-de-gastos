@@ -9,73 +9,88 @@ const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
 
 // Variables para almacenar la configuración temporal
 let configuracionTemporal = {};
+let usuarioActual = null;
 
-// Verificar si el usuario está autenticado
-document.addEventListener('DOMContentLoaded', () => {
-    verificarAutenticacion();
-    cargarConfiguracion();
-});
-
-// Función para verificar si el usuario está autenticado
-async function verificarAutenticacion() {
-    const user = auth.currentUser;
-    if (!user) {
+// Verificar autenticación al cargar la página
+document.addEventListener('DOMContentLoaded', async () => {
+    // Verificar si Firebase está disponible
+    if (!window.isFirebaseAvailable()) {
+        console.error('Firebase no está disponible');
         window.location.href = 'index.html';
         return;
     }
-    
-    // Mostrar nombre del usuario
-    nombreUsuarioSpan.textContent = user.displayName;
-}
+
+    // Verificar estado de autenticación
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            try {
+                // Obtener datos del usuario desde Firestore
+                const doc = await window.db.collection('usuarios').doc(user.uid).get();
+                if (doc.exists) {
+                    usuarioActual = doc.data();
+                    cargarConfiguracion();
+                } else {
+                    console.error('No se encontraron datos del usuario');
+                    auth.signOut();
+                }
+            } catch (error) {
+                console.error('Error al obtener datos del usuario:', error);
+                mostrarError('Error al cargar los datos del usuario');
+            }
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+});
 
 // Función para cargar la configuración guardada
-async function cargarConfiguracion() {
-    const user = auth.currentUser;
-    if (!user) return;
+function cargarConfiguracion() {
+    if (!usuarioActual) return;
 
     try {
-        const doc = await db.collection('usuarios').doc(user.uid).get();
-        if (doc.exists) {
-            const datos = doc.data();
-            configuracionTemporal = datos.configuracion || {
-                moneda: 'USD',
-                idioma: 'es',
-                formatoFecha: 'DD/MM/YYYY',
-                tema: 'claro'
-            };
+        configuracionTemporal = usuarioActual.configuracion || {
+            moneda: 'DOP',
+            idioma: 'es',
+            formatoFecha: 'DD/MM/YYYY',
+            tema: 'claro'
+        };
 
-            // Cargar valores en los selectores
-            monedaSelect.value = configuracionTemporal.moneda;
-            idiomaSelect.value = configuracionTemporal.idioma;
-            formatoFechaSelect.value = configuracionTemporal.formatoFecha;
-            temaSelect.value = configuracionTemporal.tema;
+        // Cargar valores en los selectores
+        if (monedaSelect) monedaSelect.value = configuracionTemporal.moneda;
+        if (idiomaSelect) idiomaSelect.value = configuracionTemporal.idioma;
+        if (formatoFechaSelect) formatoFechaSelect.value = configuracionTemporal.formatoFecha;
+        if (temaSelect) temaSelect.value = configuracionTemporal.tema;
 
-            // Aplicar tema y traducción actual
-            aplicarTema(configuracionTemporal.tema);
-            traducirInterfaz(configuracionTemporal.idioma);
+        // Mostrar nombre del usuario
+        if (nombreUsuarioSpan) {
+            nombreUsuarioSpan.textContent = usuarioActual.nombre || 'Usuario';
         }
+
+        // Aplicar tema y traducción actual
+        aplicarTema(configuracionTemporal.tema);
+        traducirInterfaz(configuracionTemporal.idioma);
+
     } catch (error) {
         console.error('Error al cargar configuración:', error);
-        mostrarError(getTranslation('settingsError', configuracionTemporal.idioma));
+        mostrarError('Error al cargar la configuración');
     }
 }
 
 // Función para guardar la configuración
 async function guardarConfiguracion() {
-    const user = auth.currentUser;
-    if (!user) return;
+    if (!usuarioActual) return;
 
     try {
         // Actualizar configuración temporal con los valores actuales
         configuracionTemporal = {
-            moneda: monedaSelect.value,
-            idioma: idiomaSelect.value,
-            formatoFecha: formatoFechaSelect.value,
-            tema: temaSelect.value
+            moneda: monedaSelect ? monedaSelect.value : configuracionTemporal.moneda,
+            idioma: idiomaSelect ? idiomaSelect.value : configuracionTemporal.idioma,
+            formatoFecha: formatoFechaSelect ? formatoFechaSelect.value : configuracionTemporal.formatoFecha,
+            tema: temaSelect ? temaSelect.value : configuracionTemporal.tema
         };
 
         // Guardar en Firestore
-        await db.collection('usuarios').doc(user.uid).update({
+        await window.db.collection('usuarios').doc(usuarioActual.id).update({
             configuracion: configuracionTemporal
         });
 
@@ -83,42 +98,66 @@ async function guardarConfiguracion() {
         aplicarTema(configuracionTemporal.tema);
         traducirInterfaz(configuracionTemporal.idioma);
 
-        // Mostrar mensaje de éxito
-        mostrarMensajeExito(getTranslation('settingsSaved', configuracionTemporal.idioma));
+        mostrarExito('Configuración guardada correctamente');
     } catch (error) {
         console.error('Error al guardar configuración:', error);
-        mostrarError(getTranslation('settingsError', configuracionTemporal.idioma));
+        mostrarError('Error al guardar la configuración');
     }
 }
 
 // Función para traducir la interfaz
 function traducirInterfaz(idioma) {
-    // Traducir títulos y encabezados
-    document.title = getTranslation('appTitle', idioma);
-    document.querySelector('h1').textContent = getTranslation('appTitle', idioma);
-    document.querySelector('h2').textContent = getTranslation('settingsTitle', idioma);
+    const traducciones = obtenerTraducciones(idioma);
+    
+    // Traducir elementos de la página
+    document.querySelectorAll('[data-traducir]').forEach(elemento => {
+        const clave = elemento.getAttribute('data-traducir');
+        if (traducciones[clave]) {
+            elemento.textContent = traducciones[clave];
+        }
+    });
+}
 
-    // Traducir etiquetas de configuración
-    const configItems = document.querySelectorAll('.config-item h3');
-    configItems[0].textContent = getTranslation('currency', idioma);
-    configItems[1].textContent = getTranslation('language', idioma);
-    configItems[2].textContent = getTranslation('dateFormat', idioma);
-    configItems[3].textContent = getTranslation('theme', idioma);
-
-    // Traducir botones
-    guardarConfigBtn.textContent = getTranslation('saveChanges', idioma);
-    btnCerrarSesion.textContent = getTranslation('logout', idioma);
-
-    // Traducir enlaces del menú
-    const menuLinks = document.querySelectorAll('.menu-principal a');
-    menuLinks[0].textContent = getTranslation('home', idioma);
-    menuLinks[1].textContent = getTranslation('settings', idioma);
-
-    // Traducir opciones del tema
-    const temaOptions = temaSelect.options;
-    temaOptions[0].textContent = getTranslation('lightTheme', idioma);
-    temaOptions[1].textContent = getTranslation('darkTheme', idioma);
-    temaOptions[2].textContent = getTranslation('blueTheme', idioma);
+// Función para obtener traducciones según el idioma
+function obtenerTraducciones(idioma) {
+    const traducciones = {
+        es: {
+            appTitle: 'Control de Gastos',
+            settingsTitle: 'Configuración',
+            currency: 'Moneda',
+            language: 'Idioma',
+            dateFormat: 'Formato de fecha',
+            theme: 'Tema',
+            saveChanges: 'Guardar cambios',
+            logout: 'Cerrar sesión',
+            home: 'Inicio',
+            settings: 'Configuración',
+            lightTheme: 'Tema claro',
+            darkTheme: 'Tema oscuro',
+            blueTheme: 'Tema azul',
+            settingsSaved: 'Configuración guardada correctamente',
+            settingsError: 'Error al guardar la configuración'
+        },
+        en: {
+            appTitle: 'Expense Tracker',
+            settingsTitle: 'Settings',
+            currency: 'Currency',
+            language: 'Language',
+            dateFormat: 'Date format',
+            theme: 'Theme',
+            saveChanges: 'Save changes',
+            logout: 'Logout',
+            home: 'Home',
+            settings: 'Settings',
+            lightTheme: 'Light theme',
+            darkTheme: 'Dark theme',
+            blueTheme: 'Blue theme',
+            settingsSaved: 'Settings saved successfully',
+            settingsError: 'Error saving settings'
+        }
+    };
+    
+    return traducciones[idioma] || traducciones['es'];
 }
 
 // Función para aplicar el tema seleccionado
@@ -132,66 +171,90 @@ function mostrarError(mensaje) {
     const mensajeError = document.createElement('div');
     mensajeError.className = 'mensaje-error';
     mensajeError.textContent = mensaje;
-    
     mostrarMensaje(mensajeError);
 }
 
 // Función para mostrar mensajes de éxito
-function mostrarMensajeExito(mensaje) {
+function mostrarExito(mensaje) {
     const mensajeExito = document.createElement('div');
     mensajeExito.className = 'mensaje-exito';
     mensajeExito.textContent = mensaje;
-    
     mostrarMensaje(mensajeExito);
 }
 
 // Función para mostrar mensajes temporales
 function mostrarMensaje(elementoMensaje) {
-    document.querySelector('.seccion-configuracion').appendChild(elementoMensaje);
-    
+    document.body.appendChild(elementoMensaje);
+    setTimeout(() => elementoMensaje.classList.add('mostrar'), 100);
     setTimeout(() => {
-        elementoMensaje.style.opacity = '1';
-    }, 100);
-    
-    setTimeout(() => {
-        elementoMensaje.style.opacity = '0';
-        setTimeout(() => {
-            elementoMensaje.remove();
-        }, 300);
+        elementoMensaje.classList.remove('mostrar');
+        setTimeout(() => elementoMensaje.remove(), 300);
     }, 3000);
 }
 
 // Event Listeners
-guardarConfigBtn.addEventListener('click', guardarConfiguracion);
+if (guardarConfigBtn) {
+    guardarConfigBtn.addEventListener('click', guardarConfiguracion);
+}
 
 // Event Listeners para los selectores
-monedaSelect.addEventListener('change', () => {
-    configuracionTemporal.moneda = monedaSelect.value;
-});
+if (monedaSelect) {
+    monedaSelect.addEventListener('change', () => {
+        configuracionTemporal.moneda = monedaSelect.value;
+    });
+}
 
-idiomaSelect.addEventListener('change', () => {
-    configuracionTemporal.idioma = idiomaSelect.value;
-    traducirInterfaz(idiomaSelect.value);
-});
+if (idiomaSelect) {
+    idiomaSelect.addEventListener('change', () => {
+        configuracionTemporal.idioma = idiomaSelect.value;
+        traducirInterfaz(idiomaSelect.value);
+    });
+}
 
-formatoFechaSelect.addEventListener('change', () => {
-    configuracionTemporal.formatoFecha = formatoFechaSelect.value;
-});
+if (formatoFechaSelect) {
+    formatoFechaSelect.addEventListener('change', () => {
+        configuracionTemporal.formatoFecha = formatoFechaSelect.value;
+    });
+}
 
-temaSelect.addEventListener('change', () => {
-    configuracionTemporal.tema = temaSelect.value;
-    aplicarTema(temaSelect.value);
-});
+if (temaSelect) {
+    temaSelect.addEventListener('change', () => {
+        configuracionTemporal.tema = temaSelect.value;
+        aplicarTema(temaSelect.value);
+    });
+}
 
 // Event Listener para cerrar sesión
-btnCerrarSesion.addEventListener('click', () => {
-    auth.signOut().then(() => {
-        window.location.href = 'index.html';
-    }).catch((error) => {
-        console.error('Error al cerrar sesión:', error);
-        mostrarError(getTranslation('settingsError', configuracionTemporal.idioma));
+if (btnCerrarSesion) {
+    btnCerrarSesion.addEventListener('click', () => {
+        auth.signOut()
+            .then(() => {
+                window.location.href = 'index.html';
+            })
+            .catch(error => {
+                console.error('Error al cerrar sesión:', error);
+                mostrarError('Error al cerrar sesión');
+            });
     });
-});
+}
+
+// Exportar funciones necesarias
+window.formatearMoneda = function(monto, moneda = configuracionTemporal.moneda) {
+    return new Intl.NumberFormat('es-DO', {
+        style: 'currency',
+        currency: moneda
+    }).format(monto);
+};
+
+window.formatearFecha = function(fecha, formato = configuracionTemporal.formatoFecha) {
+    const date = new Date(fecha);
+    const opciones = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    };
+    return date.toLocaleDateString('es-DO', opciones);
+};
 
 // Configuración de categorías y subcategorías de gastos
 const categoriasGastosDiarios = [
@@ -330,24 +393,69 @@ const categoriasGastosFijos = [
 
 // Configuración de la aplicación
 const config = {
-    // Configuración de fecha
+    // Configuración de fechas
     fecha: {
         formato: 'DD/MM/YYYY',
-        separador: '/'
+        separador: '/',
+        orden: ['dia', 'mes', 'año']
+    },
+    
+    // Configuración de notificaciones
+    notificaciones: {
+        porcentajeAlerta: 80, // Porcentaje del sueldo gastado para activar la alerta
+        intervaloVerificacion: 1000 * 60 * 60, // Verificar cada hora
+        mensajes: {
+            limiteCercano: '¡Alerta! Has gastado el {porcentaje}% de tu sueldo mensual',
+            limiteAlcanzado: '¡Advertencia! Has alcanzado el {porcentaje}% de tu sueldo mensual',
+            limiteExcedido: '¡Peligro! Has excedido el {porcentaje}% de tu sueldo mensual'
+        }
     }
 };
 
-// Función para formatear fecha
+// Función para formatear fechas
 function formatearFecha(fecha) {
     const fechaObj = new Date(fecha);
     const dia = fechaObj.getDate().toString().padStart(2, '0');
     const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
     const año = fechaObj.getFullYear();
+    
     return `${dia}${config.fecha.separador}${mes}${config.fecha.separador}${año}`;
 }
 
-// Exportar las configuraciones y funciones
+// Función para verificar límites de gastos
+function verificarLimiteGastos(sueldo, gastosFijos, gastosDiarios) {
+    const totalGastosFijos = gastosFijos.reduce((total, gasto) => total + gasto.monto, 0);
+    const totalGastosDiarios = gastosDiarios.reduce((total, gasto) => total + gasto.monto, 0);
+    const totalGastos = totalGastosFijos + totalGastosDiarios;
+    
+    const porcentajeGastado = (totalGastos / sueldo) * 100;
+    
+    if (porcentajeGastado >= 100) {
+        return {
+            alerta: true,
+            mensaje: config.notificaciones.mensajes.limiteExcedido.replace('{porcentaje}', Math.round(porcentajeGastado))
+        };
+    } else if (porcentajeGastado >= config.notificaciones.porcentajeAlerta) {
+        return {
+            alerta: true,
+            mensaje: config.notificaciones.mensajes.limiteAlcanzado.replace('{porcentaje}', Math.round(porcentajeGastado))
+        };
+    } else if (porcentajeGastado >= config.notificaciones.porcentajeAlerta * 0.8) {
+        return {
+            alerta: true,
+            mensaje: config.notificaciones.mensajes.limiteCercano.replace('{porcentaje}', Math.round(porcentajeGastado))
+        };
+    }
+    
+    return {
+        alerta: false,
+        mensaje: ''
+    };
+}
+
+// Exportar configuración y funciones
 window.categoriasGastosDiarios = categoriasGastosDiarios;
 window.categoriasGastosFijos = categoriasGastosFijos;
 window.config = config;
-window.formatearFecha = formatearFecha; 
+window.formatearFecha = formatearFecha;
+window.verificarLimiteGastos = verificarLimiteGastos; 
